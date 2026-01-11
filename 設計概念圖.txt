@@ -1,0 +1,82 @@
+賣場 系統
+
+	商品表		商品ID, 條碼, 名稱, 規格, 售價, 庫存量		核心資訊
+	廠商表		廠商ID, 名稱, 統編, 地址, 電話			供應來源
+	供應關係表	商品ID, 廠商ID, 進貨價				廠商和商品的關聯
+
+	進貨單		單號, 廠商ID, 日期, 總金額, 狀態			交易紀錄	
+	進貨明細		明細ID, 單號, 商品ID, 進貨價, 數量		紀錄每一項商品的進貨成本
+	
+	出貨單		單號, 顧客ID, 日期,  總金額, 狀態			交易紀錄
+	出貨明細		明細ID, 商品ID, 商品價格, 數量, 日期		用於扣除庫存
+
+
+-- 1. 廠商表
+CREATE TABLE Suppliers (
+    SupplierID INT PRIMARY KEY AUTO_INCREMENT,
+    SupplierName VARCHAR(100) NOT NULL,
+    TaxID VARCHAR(20),
+    Address TEXT,
+    Phone VARCHAR(20)
+);
+
+-- 2. 商品表
+CREATE TABLE Products (
+    ProductID INT PRIMARY KEY AUTO_INCREMENT,
+    Barcode VARCHAR(50) UNIQUE,
+    ProductName VARCHAR(100) NOT NULL,
+    Spec VARCHAR(50),
+    Price DECIMAL(10, 2), -- 零售價
+    StockQuantity INT DEFAULT 0
+);
+
+-- 3. 供應關係表 (哪家廠商供哪些貨)
+CREATE TABLE Product_Supplier (
+    ProductID INT,
+    SupplierID INT,
+    DefaultCost DECIMAL(10, 2),
+    PRIMARY KEY (ProductID, SupplierID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID),
+    FOREIGN KEY (SupplierID) REFERENCES Suppliers(SupplierID)
+);
+
+-- 4. 進貨單主表
+CREATE TABLE PurchaseOrders (
+    PO_ID VARCHAR(20) PRIMARY KEY,
+    SupplierID INT,
+    OrderDate DATE,
+    TotalAmount DECIMAL(10, 2),
+    Status VARCHAR(20), -- 如: 已入庫, 待處理
+    FOREIGN KEY (SupplierID) REFERENCES Suppliers(SupplierID)
+);
+
+-- 5. 進貨明細表
+CREATE TABLE PurchaseDetails (
+    DetailID INT PRIMARY KEY AUTO_INCREMENT,
+    PO_ID VARCHAR(20),
+    ProductID INT,
+    Cost DECIMAL(10, 2), -- 當次實際進貨價
+    Quantity INT,
+    FOREIGN KEY (PO_ID) REFERENCES PurchaseOrders(PO_ID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+-- 6. 出貨單 (銷售單)
+CREATE TABLE SalesOrders (
+    OrderID VARCHAR(20) PRIMARY KEY,
+    OrderDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    TotalAmount DECIMAL(10, 2),
+    Status VARCHAR(20),
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID) -- 若有顧客表
+);
+
+-- 7. 出貨明細
+CREATE TABLE SalesDetails (
+    DetailID INT PRIMARY KEY AUTO_INCREMENT,
+    OrderID VARCHAR(20),
+    ProductID INT,
+    UnitPrice DECIMAL(10, 2), -- 賣出當下的價格
+    Quantity INT,
+    FOREIGN KEY (OrderID) REFERENCES SalesOrders(OrderID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
