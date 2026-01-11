@@ -1,0 +1,22 @@
+# --- Java / Maven ---
+**/target/
+**/*.class
+**/*.jar
+
+# --- IDE (VS Code, IntelliJ, Eclipse) ---
+.idea/
+.vscode/
+*.iml
+.project
+.classpath
+.settings/
+bin/
+
+# --- Frontend (Node.js) ---
+**/node_modules/
+**/dist/
+.eslintcache
+
+# --- OS ---
+.DS_Store
+Thumbs.db
