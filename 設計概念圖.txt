@@ -45,7 +45,7 @@ CREATE TABLE PurchaseOrders (
     PO_ID VARCHAR(20) PRIMARY KEY,
     SupplierID INT,
     OrderDate DATE,
-    TotalAmount DECIMAL(10, 2),
+    TotalAmount DECIMALSubtotal(10, 2),
     Status VARCHAR(20), -- 如: 已入庫, 待處理
     FOREIGN KEY (SupplierID) REFERENCES Suppliers(SupplierID)
 );
