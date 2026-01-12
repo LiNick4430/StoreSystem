@@ -18,5 +18,14 @@ public class GlobalExceptionHandler {
 		ErrorCode errorCode = ErrorCode.ENUM_NOT_FOUND;
 		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
 	}
+
+	// 處理 缺少特定數值 的 異常 (400)
+	@ExceptionHandler(ValueMissException.class) 	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)     		// 400
+	public ApiResponse<?> handleValueMissException(ValueMissException ex) {
+		int statusCode = HttpStatus.BAD_REQUEST.value();
+		ErrorCode errorCode = ErrorCode.VALUES_MISS;
+		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
+	}
 	
 }
