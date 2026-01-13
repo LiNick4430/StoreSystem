@@ -1,15 +1,14 @@
 package com.storesystem.backend.service.impl;
 
-import java.math.BigDecimal;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.storesystem.backend.exception.ProductExistsException;
 import com.storesystem.backend.exception.ProductNotFoundException;
-import com.storesystem.backend.exception.ValueMissException;
 import com.storesystem.backend.model.dto.PageDTO;
 import com.storesystem.backend.model.dto.product.ProductCreateDTO;
 import com.storesystem.backend.model.dto.product.ProductDTO;
@@ -24,9 +23,10 @@ import com.storesystem.backend.model.dto.product.ProductUpdateDTO;
 import com.storesystem.backend.model.entity.Product;
 import com.storesystem.backend.repository.ProductRepository;
 import com.storesystem.backend.service.ProductService;
-import com.storesystem.backend.util.BigDecimalUtil;
 import com.storesystem.backend.util.PageUtil;
 
+@Service
+@Transactional
 public class ProductServiceImpl implements ProductService{
 
 	@Autowired
@@ -37,132 +37,117 @@ public class ProductServiceImpl implements ProductService{
 
 	@Override
 	public PageDTO<ProductDTO> findAllProductsByPage(ProductFindAllDTO dto) {
-		// 1. 前處理
-		if (dto.getPage() == null || dto.getSize() == null) {
-			throw new ValueMissException("缺少頁碼/大小");
-		}
-
-		// 2. 建立頁碼資料
+		// 1. 建立頁碼資料
 		Pageable pageable = PageUtil.getPageable(dto.getPage(), dto.getSize());
-		
-		// 3. 搜尋資料
+
+		// 2. 搜尋資料
 		Page<Product> page = productRepository.findAll(pageable);
 
-		// 4. 轉成 DTO
+		// 3. 轉成 DTO
 		return PageUtil.toPageDTO(page, product -> modelMapper.map(product, ProductDTO.class));
 	}
 
 	@Override
 	public PageDTO<ProductDTO> findAllProductsByProductNameAndPage(ProductFindByNameDTO dto) {
 		// 1. 前處理
-		if (dto.getPage() == null || dto.getSize() == null|| 
-				dto.getName() == null || dto.getName().isBlank()
-				) {
-			throw new ValueMissException("缺少頁碼/大小/商品名");
-		}
 		String nameLike = "%" + dto.getName() + "%";
-		
+
 		// 2. 建立頁碼資料
 		Pageable pageable = PageUtil.getPageable(dto.getPage(), dto.getSize());
-		
+
 		// 3. 搜尋資料
 		Page<Product> page = productRepository.findAllByProductNameLike(nameLike, pageable);
-		
+
 		// 4. 轉成 DTO
 		return PageUtil.toPageDTO(page, product -> modelMapper.map(product, ProductDTO.class));
 	}
 
 	@Override
 	public PageDTO<ProductDTO> findAllProductsBySupplierAndPage(ProductFindBySupplierDTO dto) {
-		// 1. 前處理
-		if (dto.getPage() == null || dto.getSize() == null|| 
-				dto.getSupplierId() == null
-				) {
-			throw new ValueMissException("缺少頁碼/大小/供應商ID");
-		}
-
-		// 2. 建立頁碼資料
+		// 1. 建立頁碼資料
 		Pageable pageable = PageUtil.getPageable(dto.getPage(), dto.getSize());
 
-		// 3. 搜尋資料
+		// 2. 搜尋資料
 		Page<Product> page = productRepository.findAllBySupplierId(dto.getSupplierId(), pageable);
 
-		// 4. 轉成 DTO
+		// 3. 轉成 DTO
 		return PageUtil.toPageDTO(page, product -> modelMapper.map(product, ProductDTO.class));
 	}
 
 	@Override
 	public ProductDTO findProductById(ProductFindByIdDTO dto) {
-		// 1. 前處理
-		if (dto.getId() == null) {
-			throw new ValueMissException("缺少商品ID");
-		}
-		
-		// 2. 搜尋資料
+		// 1. 搜尋資料
 		Product product = productRepository.findById(dto.getId())
 				.orElseThrow(() -> new ProductNotFoundException("找不到該商品"));
-		
-		// 3. 轉成 DTO
+
+		// 2. 轉成 DTO
 		return modelMapper.map(product, ProductDTO.class);
 	}
 
 	@Override
 	public ProductDTO findProductByBarcode(ProductFindByBarcodeDTO dto) {
-		// 1. 前處理
-		if (dto.getBarcode() == null || dto.getBarcode().isBlank()) {
-			throw new ValueMissException("缺少商品條碼");
-		}
-		
-		// 2. 搜尋資料
+		// 1. 搜尋資料
 		Product product = productRepository.findByBarcode(dto.getBarcode())
 				.orElseThrow(() -> new ProductNotFoundException("找不到該商品"));
-		
-		// 3. 轉成 DTO
+
+		// 2. 轉成 DTO
 		return modelMapper.map(product, ProductDTO.class);
 	}
-	
+
 	@Override
 	public ProductDTO createProdcut(ProductCreateDTO dto) {
 		// 1. 前處理
-		if (dto.getBarcode() == null || dto.getBarcode().isBlank() ||
-				dto.getName() == null || dto.getName().isBlank() || 
-						dto.getSpec() == null || dto.getSpec().isBlank() || 
-								dto.getPrice() == null ) {
-			throw new ValueMissException("缺少商品條碼/商品名稱/商品規格/商品價格");
-		}
-		
 		String barcode = dto.getBarcode();
 		if (productRepository.existsByBarcodeIncludingDeleted(barcode)) {
 			throw new ProductExistsException("商品條碼已經被使用");
 		}
-		
-		BigDecimal price = dto.getPrice();
-		BigDecimalUtil.validatePrice(price);
-		
+
 		// 2. 建立商品
 		Product product = new Product();
 		product.setBarcode(barcode);
 		product.setProductName(dto.getName());
 		product.setSpec(dto.getSpec());
-		product.setPrice(price);
-		
+		product.setPrice(dto.getPrice());
+
 		// 3. 儲存商品
 		product = productRepository.save(product);
-		
+
 		// 4. 轉成 DTO
 		return modelMapper.map(product, ProductDTO.class);
 	}
 
 	@Override
 	public ProductDTO updateProduct(ProductUpdateDTO dto) {
-		// TODO Auto-generated method stub
-		return null;
+		// 1. 尋找商品
+		Product product = productRepository.findById(dto.getId())
+				.orElseThrow(() -> new ProductNotFoundException("找不到該商品"));
+
+		// 2. 更新資料
+		product.setProductName(dto.getName());
+		product.setSpec(dto.getSpec());
+		product.setPrice(dto.getPrice());
+
+		// 3. 儲存商品
+		product = productRepository.save(product);
+
+		// 4. 轉成 DTO
+		return modelMapper.map(product, ProductDTO.class);
 	}
 
 	@Override
-	public void setProductSaleStatus(ProductIsForSaleDTO dto) {
-		// TODO Auto-generated method stub
+	public ProductDTO setProductSaleStatus(ProductIsForSaleDTO dto) {
+		// 1. 尋找商品
+		Product product = productRepository.findById(dto.getId())
+				.orElseThrow(() -> new ProductNotFoundException("找不到該商品"));
 
+		// 2. 更新資料
+		product.setIsForSale(dto.getIsForSale());
+		
+		// 3. 儲存商品
+		product = productRepository.save(product);
+		
+		// 4. 轉成 DTO
+		return modelMapper.map(product, ProductDTO.class);
 	}
 
 	@Override

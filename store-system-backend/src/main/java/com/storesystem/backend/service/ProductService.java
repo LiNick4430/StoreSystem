@@ -29,7 +29,7 @@ public interface ProductService {
 	ProductDTO updateProduct(ProductUpdateDTO dto);
 	
 	// 控制 商品是否銷售(上下架)
-	void setProductSaleStatus(ProductIsForSaleDTO dto);
+	ProductDTO setProductSaleStatus(ProductIsForSaleDTO dto);
 	
 	// 刪除商品 (當供應商不再出貨/已停產的商品/條碼更新後原條碼的商品)
 	void deleteProduct(ProductDeleteDTO dto);

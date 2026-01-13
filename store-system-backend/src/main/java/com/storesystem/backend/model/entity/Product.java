@@ -40,7 +40,7 @@ public class Product extends BaseEntity{
 	private BigDecimal price;		// 商品售價
 	
 	@Column(name = "is_for_sale", nullable = false)
-	private boolean isForSale = false;	// 是否販賣 預設 否
+	private Boolean isForSale = false;	// 是否販賣 預設 否
 	
 	@Column(name = "stock_quantity", nullable = false)
 	private Integer stockQuantity = 0;	// 商品庫存量 預設 0

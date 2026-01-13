@@ -1,0 +1,15 @@
+ProductController
+@RequestMapping("/product")
+
+Inside
+POST 	findAllProductsByPage 				->	"/find/all/page"
+POST 	findAllProductsByProductNameAndPage ->	"/find/all/product/name/page"
+POST 	findAllProductsBySupplierAndPage 	->	"/find/all/supplier/page"
+POST 	findProductById 					->	"/find/id"
+POST 	findProductByBarcode 				->	"/find/barcode"
+POST 	createProdcut 						->	"/create"
+POST 	updateProduct 						->	"/update"
+POST 	setProductSaleStatus 				->	"/set/sale/status"
+DELETE 	deleteProduct 						->	"/delete"
+
+Outside
