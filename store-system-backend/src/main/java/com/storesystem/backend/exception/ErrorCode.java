@@ -4,6 +4,9 @@ package com.storesystem.backend.exception;
 public enum ErrorCode {
 
 	ENUM_NOT_FOUND,
+	PRODUCT_NOT_FOUND,
+	
+	PRODUCT_EXISTS,
 	
 	VALUES_MISS
 	
