@@ -50,8 +50,8 @@ public interface ProductRepository extends JpaRepository<Product, Long>{
 	Optional<Product> findByProductIdForUpdate(@Param("productId") Long productId);
 	
 	/** 自訂 檢查 條碼是否 已經存在(包含已經軟刪除的) */
-	@Query(value = "SELECT EXISTS (SELECT 1 FROM product WHERE barcode = :barcode)",
-			nativeQuery = true
-			)
-	boolean existsByBarcodeIncludingDeleted(@Param("barcode") String barcode);
+	@Query(value = "SELECT COUNT(*) FROM product "
+			+ "WHERE barcode = :barcode ",
+			nativeQuery = true)
+	long existsByBarcodeIncludingDeleted(@Param("barcode") String barcode);
 }

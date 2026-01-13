@@ -68,6 +68,7 @@ public class ProductServiceImpl implements ProductService{
 		Pageable pageable = PageUtil.getPageable(dto.getPage(), dto.getSize());
 
 		// 2. 搜尋資料
+		// TODO 可能要先看看 供應商 存不存在
 		Page<Product> page = productRepository.findAllBySupplierId(dto.getSupplierId(), pageable);
 
 		// 3. 轉成 DTO
@@ -98,7 +99,7 @@ public class ProductServiceImpl implements ProductService{
 	public ProductDTO createProdcut(ProductCreateDTO dto) {
 		// 1. 前處理
 		String barcode = dto.getBarcode();
-		if (productRepository.existsByBarcodeIncludingDeleted(barcode)) {
+		if (productRepository.existsByBarcodeIncludingDeleted(barcode) > 0) {
 			throw new ProductExistsException("商品條碼已經被使用");
 		}
 
