@@ -17,6 +17,8 @@ import com.storesystem.backend.model.dto.product.ProductFindByIdDTO;
 import com.storesystem.backend.model.dto.product.ProductFindByNameDTO;
 import com.storesystem.backend.model.dto.product.ProductFindBySupplierDTO;
 import com.storesystem.backend.model.dto.product.ProductIsForSaleDTO;
+import com.storesystem.backend.model.dto.product.ProductSearchAllDTO;
+import com.storesystem.backend.model.dto.product.ProductSearchDTO;
 import com.storesystem.backend.model.dto.product.ProductUpdateDTO;
 import com.storesystem.backend.response.ApiResponse;
 import com.storesystem.backend.service.ProductService;
@@ -48,31 +50,31 @@ public class ProductController {
 	
 	@PostMapping("/find/all/page")
 	public ApiResponse<PageDTO<ProductDTO>> findAllProductsByPage(@Valid @RequestBody FindAllDTO dto) {
-		PageDTO<ProductDTO> pageDTO = productService.findAllProductsByPage(dto);
+		PageDTO<ProductDTO> pageDTO = productService.searchAllProduct(ProductSearchAllDTO.from(dto));
 		return ApiResponse.success("搜尋商品成功", pageDTO);
 	}
 	
 	@PostMapping("/find/all/product/name/page")
 	public ApiResponse<PageDTO<ProductDTO>> findAllProductsByProductNameAndPage(@Valid @RequestBody ProductFindByNameDTO dto) {
-		PageDTO<ProductDTO> pageDTO = productService.findAllProductsByProductNameAndPage(dto);
+		PageDTO<ProductDTO> pageDTO = productService.searchAllProduct(ProductSearchAllDTO.from(dto));
 		return ApiResponse.success("搜尋商品成功", pageDTO);
 	}
 	
 	@PostMapping("/find/all/supplier/page")
 	public ApiResponse<PageDTO<ProductDTO>> findAllProductsBySupplierAndPage(@Valid @RequestBody ProductFindBySupplierDTO dto) {
-		PageDTO<ProductDTO> pageDTO = productService.findAllProductsBySupplierAndPage(dto);
+		PageDTO<ProductDTO> pageDTO = productService.searchAllProduct(ProductSearchAllDTO.from(dto));
 		return ApiResponse.success("搜尋商品成功", pageDTO);
 	}
 	
 	@PostMapping("/find/id")
 	public ApiResponse<ProductDTO> findProductById(@Valid @RequestBody ProductFindByIdDTO dto) {
-		ProductDTO productDTO = productService.findProductById(dto);
+		ProductDTO productDTO = productService.searchProduct(ProductSearchDTO.from(dto));
 		return ApiResponse.success("搜尋商品成功", productDTO);
 	}
 	
 	@PostMapping("/find/barcode")
 	public ApiResponse<ProductDTO> findProductByBarcode(@Valid @RequestBody ProductFindByBarcodeDTO dto) {
-		ProductDTO productDTO = productService.findProductByBarcode(dto);
+		ProductDTO productDTO = productService.searchProduct(ProductSearchDTO.from(dto));
 		return ApiResponse.success("搜尋商品成功", productDTO);
 	}
 	

@@ -32,7 +32,7 @@ public class ProductSupplier extends BaseEntity{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "product_supplier_id")
-	private Long productSupplierId;		// 技術用 ID
+	private Long productSupplierId;		// ID
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id", nullable = false)

@@ -94,9 +94,6 @@ public class SupplierServiceImpl implements SupplierService{
 		if (supplierRepository.existsByTaxIdIncludingDeleted(taxId) > 0) {
 			throw new SupplierExistsException("供應商統編已經被使用");
 		}
-		if (!TaiwanTaxIdValidator.isValid(taxId)) {
-			throw new TaxIdErrorException("統編規格 錯誤");
-		}
 		
 		// 2. 建立供應商
 		Supplier supplier = new Supplier();
