@@ -33,6 +33,24 @@ public class GlobalExceptionHandler {
 		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
 	}
 	
+	// 處理 供應商(Supplier) 找不到 的 異常 (401)
+	@ExceptionHandler(SupplierNotFoundException.class) 	
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)     		// 401
+	public ApiResponse<?> handleSupplierNotFoundException(SupplierNotFoundException ex) {
+		int statusCode = HttpStatus.UNAUTHORIZED.value();
+		ErrorCode errorCode = ErrorCode.SUPPLIER_NOT_FOUND;
+		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
+	}
+	
+	// 處理 供應商(Supplier) 已經存在 的 異常 (401)
+	@ExceptionHandler(SupplierExistsException.class) 	
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)     		// 401
+	public ApiResponse<?> handleSupplierExistsException(SupplierExistsException ex) {
+		int statusCode = HttpStatus.UNAUTHORIZED.value();
+		ErrorCode errorCode = ErrorCode.SUPPLIER_EXISTS;
+		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
+	}
+	
 	// 處理 使用 ENUM 卻 找不到 code 的 異常 (401)
 	@ExceptionHandler(EnumNotFoundException.class) 	
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)     		// 401
@@ -51,6 +69,15 @@ public class GlobalExceptionHandler {
 		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
 	}
 	
+	// 處理 統編規格 錯誤 的 異常 (400)
+	@ExceptionHandler(TaxIdErrorException.class) 	
+	@ResponseStatus(HttpStatus.BAD_REQUEST)     		// 400
+	public ApiResponse<?> handleTaxIdErrorException(TaxIdErrorException ex) {
+		int statusCode = HttpStatus.BAD_REQUEST.value();
+		ErrorCode errorCode = ErrorCode.TAX_ID_ERROR;
+		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
+	}
+	
 	// 處理 BEAN VALIDATION 統一處理的 缺少特定數值 的 異常 (400)
 	// 針對 @RequestBody @Valid DTO
 	@ExceptionHandler(MethodArgumentNotValidException.class)
@@ -62,7 +89,7 @@ public class GlobalExceptionHandler {
 	            .collect(Collectors.joining(", "));
 		
 		int statusCode = HttpStatus.BAD_REQUEST.value();
-		ErrorCode errorCode = ErrorCode.VALUES_MISS;
+		ErrorCode errorCode = ErrorCode.VALID_ERROR;
 		return ApiResponse.error(statusCode, errorMessage, errorCode);
 	}
 	
@@ -82,7 +109,7 @@ public class GlobalExceptionHandler {
 	            .collect(Collectors.joining(", "));
 		
 		int statusCode = HttpStatus.BAD_REQUEST.value();
-		ErrorCode errorCode = ErrorCode.VALUES_MISS;
+		ErrorCode errorCode = ErrorCode.VALID_ERROR;
 		return ApiResponse.error(statusCode, errorMessage, errorCode);
 	}
 }

@@ -1,11 +1,11 @@
 package com.storesystem.backend.service;
 
 import com.storesystem.backend.model.dto.PageDTO;
+import com.storesystem.backend.model.dto.FindAllDTO;
 import com.storesystem.backend.model.dto.product.ProductCreateDTO;
 import com.storesystem.backend.model.dto.product.ProductDTO;
 import com.storesystem.backend.model.dto.product.ProductDeleteDTO;
 import com.storesystem.backend.model.dto.product.ProductIsForSaleDTO;
-import com.storesystem.backend.model.dto.product.ProductFindAllDTO;
 import com.storesystem.backend.model.dto.product.ProductFindByNameDTO;
 import com.storesystem.backend.model.dto.product.ProductFindBySupplierDTO;
 import com.storesystem.backend.model.dto.product.ProductFindByBarcodeDTO;
@@ -16,7 +16,7 @@ public interface ProductService {
 	
 	// 內部系統 使用
 	// 搜尋商品
-	PageDTO<ProductDTO> findAllProductsByPage(ProductFindAllDTO dto);
+	PageDTO<ProductDTO> findAllProductsByPage(FindAllDTO dto);
 	PageDTO<ProductDTO> findAllProductsByProductNameAndPage(ProductFindByNameDTO dto);
 	PageDTO<ProductDTO> findAllProductsBySupplierAndPage(ProductFindBySupplierDTO dto);
 	

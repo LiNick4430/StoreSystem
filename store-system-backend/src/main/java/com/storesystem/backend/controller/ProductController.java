@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.storesystem.backend.model.dto.PageDTO;
+import com.storesystem.backend.model.dto.FindAllDTO;
 import com.storesystem.backend.model.dto.product.ProductCreateDTO;
 import com.storesystem.backend.model.dto.product.ProductDTO;
 import com.storesystem.backend.model.dto.product.ProductDeleteDTO;
-import com.storesystem.backend.model.dto.product.ProductFindAllDTO;
 import com.storesystem.backend.model.dto.product.ProductFindByBarcodeDTO;
 import com.storesystem.backend.model.dto.product.ProductFindByIdDTO;
 import com.storesystem.backend.model.dto.product.ProductFindByNameDTO;
@@ -47,21 +47,21 @@ public class ProductController {
 	private ProductService productService;
 	
 	@PostMapping("/find/all/page")
-	public ApiResponse<PageDTO<ProductDTO>> findAllProductsByPage(@Valid @RequestBody ProductFindAllDTO dto) {
-		PageDTO<ProductDTO> page = productService.findAllProductsByPage(dto);
-		return ApiResponse.success("搜尋商品成功", page);
+	public ApiResponse<PageDTO<ProductDTO>> findAllProductsByPage(@Valid @RequestBody FindAllDTO dto) {
+		PageDTO<ProductDTO> pageDTO = productService.findAllProductsByPage(dto);
+		return ApiResponse.success("搜尋商品成功", pageDTO);
 	}
 	
 	@PostMapping("/find/all/product/name/page")
 	public ApiResponse<PageDTO<ProductDTO>> findAllProductsByProductNameAndPage(@Valid @RequestBody ProductFindByNameDTO dto) {
-		PageDTO<ProductDTO> page = productService.findAllProductsByProductNameAndPage(dto);
-		return ApiResponse.success("搜尋商品成功", page);
+		PageDTO<ProductDTO> pageDTO = productService.findAllProductsByProductNameAndPage(dto);
+		return ApiResponse.success("搜尋商品成功", pageDTO);
 	}
 	
 	@PostMapping("/find/all/supplier/page")
 	public ApiResponse<PageDTO<ProductDTO>> findAllProductsBySupplierAndPage(@Valid @RequestBody ProductFindBySupplierDTO dto) {
-		PageDTO<ProductDTO> page = productService.findAllProductsBySupplierAndPage(dto);
-		return ApiResponse.success("搜尋商品成功", page);
+		PageDTO<ProductDTO> pageDTO = productService.findAllProductsBySupplierAndPage(dto);
+		return ApiResponse.success("搜尋商品成功", pageDTO);
 	}
 	
 	@PostMapping("/find/id")
@@ -92,7 +92,7 @@ public class ProductController {
 	public ApiResponse<ProductDTO> setProductSaleStatus(@Valid @RequestBody ProductIsForSaleDTO dto) {
 		ProductDTO productDTO = productService.setProductSaleStatus(dto);
 		String message = dto.getIsForSale() ? "正在銷售" : "停止銷售";
-		return ApiResponse.success("商品狀態 更新為" + message + "成功", productDTO);
+		return ApiResponse.success("商品狀態 更新為 " + message + " 成功", productDTO);
 	}
 	
 	@DeleteMapping("/delete")

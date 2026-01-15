@@ -9,11 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.storesystem.backend.exception.ProductExistsException;
 import com.storesystem.backend.exception.ProductNotFoundException;
+import com.storesystem.backend.exception.SupplierNotFoundException;
 import com.storesystem.backend.model.dto.PageDTO;
+import com.storesystem.backend.model.dto.FindAllDTO;
 import com.storesystem.backend.model.dto.product.ProductCreateDTO;
 import com.storesystem.backend.model.dto.product.ProductDTO;
 import com.storesystem.backend.model.dto.product.ProductDeleteDTO;
-import com.storesystem.backend.model.dto.product.ProductFindAllDTO;
 import com.storesystem.backend.model.dto.product.ProductFindByNameDTO;
 import com.storesystem.backend.model.dto.product.ProductFindBySupplierDTO;
 import com.storesystem.backend.model.dto.product.ProductFindByBarcodeDTO;
@@ -22,6 +23,7 @@ import com.storesystem.backend.model.dto.product.ProductIsForSaleDTO;
 import com.storesystem.backend.model.dto.product.ProductUpdateDTO;
 import com.storesystem.backend.model.entity.Product;
 import com.storesystem.backend.repository.ProductRepository;
+import com.storesystem.backend.repository.SupplierRepository;
 import com.storesystem.backend.service.ProductService;
 import com.storesystem.backend.util.PageUtil;
 
@@ -34,9 +36,12 @@ public class ProductServiceImpl implements ProductService{
 
 	@Autowired
 	private ProductRepository productRepository;
+	
+	@Autowired
+	private SupplierRepository supplierRepository;
 
 	@Override
-	public PageDTO<ProductDTO> findAllProductsByPage(ProductFindAllDTO dto) {
+	public PageDTO<ProductDTO> findAllProductsByPage(FindAllDTO dto) {
 		// 1. 建立頁碼資料
 		Pageable pageable = PageUtil.getPageable(dto.getPage(), dto.getSize());
 
@@ -64,14 +69,16 @@ public class ProductServiceImpl implements ProductService{
 
 	@Override
 	public PageDTO<ProductDTO> findAllProductsBySupplierAndPage(ProductFindBySupplierDTO dto) {
-		// 1. 建立頁碼資料
+		// 1. 檢查供應商是否存在
+		supplierRepository.findById(dto.getSupplierId()).orElseThrow(() -> new SupplierNotFoundException("找不到該供應商"));
+		
+		// 2. 建立頁碼資料
 		Pageable pageable = PageUtil.getPageable(dto.getPage(), dto.getSize());
-
-		// 2. 搜尋資料
-		// TODO 可能要先看看 供應商 存不存在
+		
+		// 3. 搜尋資料
 		Page<Product> page = productRepository.findAllBySupplierId(dto.getSupplierId(), pageable);
 
-		// 3. 轉成 DTO
+		// 4. 轉成 DTO
 		return PageUtil.toPageDTO(page, product -> modelMapper.map(product, ProductDTO.class));
 	}
 

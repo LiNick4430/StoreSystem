@@ -1,3 +1,4 @@
+================================================================================
 ProductController
 @RequestMapping("/product")
 
@@ -13,3 +14,15 @@ POST 	setProductSaleStatus 				->	"/set/sale/status"
 DELETE 	deleteProduct 						->	"/delete"
 
 Outside
+
+================================================================================
+SupplierController
+@RequestMapping("/supplier")
+
+POST	findAllSuppierByPage				-> "/find/all/page"
+POST	findAllSuppierByProductAndPage		-> "/find/all/product/page"
+POST	findById							-> "/find/id"
+POST	findByTaxId							-> "/find/tax/id"
+POST	createSupplier						-> "/create"
+POST	updateSupplier						-> "/update"
+DELETE	deleteSupplier						-> "/delete"

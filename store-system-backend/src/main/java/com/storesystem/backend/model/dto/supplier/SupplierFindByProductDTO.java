@@ -1,6 +1,5 @@
-package com.storesystem.backend.model.dto.product;
+package com.storesystem.backend.model.dto.supplier;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,10 +8,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProductFindByNameDTO {	// 搜尋 全部商品 + 頁面
+public class SupplierFindByProductDTO {	// 供應商 提供的商品
 	
-	@NotBlank(message = "缺少商品名稱")
-	private String name;	// 商品 名稱
+	@NotNull(message = "缺少商品ID")
+	private Long productId;		// 供應商 ID
 	
 	@NotNull(message = "缺少頁碼")
 	private Integer page;	// 頁面 
