@@ -10,22 +10,18 @@ import org.springframework.transaction.annotation.Transactional;
 import com.storesystem.backend.exception.ProductNotFoundException;
 import com.storesystem.backend.exception.SupplierExistsException;
 import com.storesystem.backend.exception.SupplierNotFoundException;
-import com.storesystem.backend.exception.TaxIdErrorException;
-import com.storesystem.backend.model.dto.FindAllDTO;
 import com.storesystem.backend.model.dto.PageDTO;
 import com.storesystem.backend.model.dto.supplier.SupplierCreateDTO;
 import com.storesystem.backend.model.dto.supplier.SupplierDTO;
 import com.storesystem.backend.model.dto.supplier.SupplierDeleteDTO;
-import com.storesystem.backend.model.dto.supplier.SupplierFindByIdDTO;
-import com.storesystem.backend.model.dto.supplier.SupplierFindByProductDTO;
-import com.storesystem.backend.model.dto.supplier.SupplierFindByTaxIdDTO;
+import com.storesystem.backend.model.dto.supplier.SupplierSearchAllDTO;
+import com.storesystem.backend.model.dto.supplier.SupplierSearchDTO;
 import com.storesystem.backend.model.dto.supplier.SupplierUpdateDTO;
 import com.storesystem.backend.model.entity.Supplier;
 import com.storesystem.backend.repository.ProductRepository;
 import com.storesystem.backend.repository.SupplierRepository;
 import com.storesystem.backend.service.SupplierService;
 import com.storesystem.backend.util.PageUtil;
-import com.storesystem.backend.util.TaiwanTaxIdValidator;
 
 @Service
 @Transactional
@@ -41,48 +37,42 @@ public class SupplierServiceImpl implements SupplierService{
 	private ProductRepository productRepository;
 
 	@Override
-	public PageDTO<SupplierDTO> findAllSuppierByPage(FindAllDTO dto) {
+	public PageDTO<SupplierDTO> searchAllSupplier(SupplierSearchAllDTO dto) {
 		// 1. 建立頁碼資料
 		Pageable pageable = PageUtil.getPageable(dto.getPage(), dto.getSize());
-
-		// 2. 搜尋資料
-		Page<Supplier> page = supplierRepository.findAll(pageable);
-
+		
+		// 2. 分類執行
+		Page<Supplier> page = null;
+		if (dto.getProductId() != null) {
+			// 商品ID 查詢
+			productRepository.findById(dto.getProductId()).orElseThrow(() -> new ProductNotFoundException("找不到該商品"));
+			page = supplierRepository.findAllByProductId(dto.getProductId(), pageable);
+		} else {
+			// 無條件查詢
+			page = supplierRepository.findAll(pageable);
+		}
+		
 		// 3. 轉成 DTO
-		return PageUtil.toPageDTO(page, supplier -> modelMapper.map(supplier, SupplierDTO.class));			
+		return PageUtil.toPageDTO(page, supplier -> modelMapper.map(supplier, SupplierDTO.class));
 	}
 
 	@Override
-	public PageDTO<SupplierDTO> findAllSuppierByProductAndPage(SupplierFindByProductDTO dto) {
-		// 1. 檢查商品是否存在
-		productRepository.findById(dto.getProductId()).orElseThrow(() -> new ProductNotFoundException("找不到該商品"));
-
-		// 2. 建立頁碼資料
-		Pageable pageable = PageUtil.getPageable(dto.getPage(), dto.getSize());
-
-		// 3. 搜尋資料
-		Page<Supplier> page = supplierRepository.findAllByProductId(dto.getProductId(), pageable);
-
-		// 4. 轉成 DTO
-		return PageUtil.toPageDTO(page, supplier -> modelMapper.map(supplier, SupplierDTO.class));			
-	}
-
-	@Override
-	public SupplierDTO findById(SupplierFindByIdDTO dto) {
-		// 1. 搜尋資料
-		Supplier supplier = supplierRepository.findById(dto.getId())
-				.orElseThrow(() -> new SupplierNotFoundException("找不到該供應商"));
-
-		// 2. 轉成 DTO
-		return modelMapper.map(supplier, SupplierDTO.class);
-	}
-
-	@Override
-	public SupplierDTO findByTaxId(SupplierFindByTaxIdDTO dto) {
-		// 1. 搜尋資料
-		Supplier supplier = supplierRepository.findByTaxId(dto.getTaxId())
-				.orElseThrow(() -> new SupplierNotFoundException("找不到該供應商"));
-
+	public SupplierDTO searchSupplier(SupplierSearchDTO dto) {
+		// 1. 分類執行
+		Supplier supplier = null;
+		if (dto.getSupplierId() != null) {
+			// 供應商ID 查詢
+			supplier = supplierRepository.findById(dto.getSupplierId())
+					.orElseThrow(() -> new SupplierNotFoundException("找不到該供應商"));
+		} else if (dto.getSupplierTaxId() != null) {
+			// 供應商統編 查詢
+			supplier = supplierRepository.findByTaxId(dto.getSupplierTaxId())
+					.orElseThrow(() -> new SupplierNotFoundException("找不到該供應商"));
+		} else {
+			// 防呆用 正常流程 不可能到達
+			throw new SupplierNotFoundException("找不到該供應商");
+		}
+		
 		// 2. 轉成 DTO
 		return modelMapper.map(supplier, SupplierDTO.class);
 	}
@@ -132,5 +122,7 @@ public class SupplierServiceImpl implements SupplierService{
 		// TODO Auto-generated method stub
 
 	}
+
+	
 
 }

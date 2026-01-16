@@ -15,6 +15,8 @@ import com.storesystem.backend.model.dto.supplier.SupplierDeleteDTO;
 import com.storesystem.backend.model.dto.supplier.SupplierFindByIdDTO;
 import com.storesystem.backend.model.dto.supplier.SupplierFindByProductDTO;
 import com.storesystem.backend.model.dto.supplier.SupplierFindByTaxIdDTO;
+import com.storesystem.backend.model.dto.supplier.SupplierSearchAllDTO;
+import com.storesystem.backend.model.dto.supplier.SupplierSearchDTO;
 import com.storesystem.backend.model.dto.supplier.SupplierUpdateDTO;
 import com.storesystem.backend.response.ApiResponse;
 import com.storesystem.backend.service.SupplierService;
@@ -41,25 +43,25 @@ public class SupplierController {
 	
 	@PostMapping("/find/all/page")
 	public ApiResponse<PageDTO<SupplierDTO>> findAllSuppierByPage(@Valid @RequestBody FindAllDTO dto) {
-		PageDTO<SupplierDTO> pageDTO = supplierService.findAllSuppierByPage(dto);
+		PageDTO<SupplierDTO> pageDTO = supplierService.searchAllSupplier(SupplierSearchAllDTO.from(dto));
 		return ApiResponse.success("搜尋供應商成功", pageDTO);
 	}
 	
 	@PostMapping("/find/all/product/page")
 	public ApiResponse<PageDTO<SupplierDTO>> findAllSuppierByProductAndPage(@Valid @RequestBody SupplierFindByProductDTO dto) {
-		PageDTO<SupplierDTO> pageDTO = supplierService.findAllSuppierByProductAndPage(dto);
+		PageDTO<SupplierDTO> pageDTO = supplierService.searchAllSupplier(SupplierSearchAllDTO.from(dto));
 		return ApiResponse.success("搜尋供應商成功", pageDTO);
 	}
 	
 	@PostMapping("/find/id")
 	public ApiResponse<SupplierDTO> findById(@Valid @RequestBody SupplierFindByIdDTO dto) {
-		SupplierDTO supplierDTO = supplierService.findById(dto);
+		SupplierDTO supplierDTO = supplierService.searchSupplier(SupplierSearchDTO.from(dto));
 		return ApiResponse.success("搜尋供應商成功", supplierDTO);
 	}
 	
 	@PostMapping("/find/tax/id")
 	public ApiResponse<SupplierDTO> findByTaxId(@Valid @RequestBody SupplierFindByTaxIdDTO dto) {
-		SupplierDTO supplierDTO = supplierService.findByTaxId(dto);
+		SupplierDTO supplierDTO = supplierService.searchSupplier(SupplierSearchDTO.from(dto));
 		return ApiResponse.success("搜尋供應商成功", supplierDTO);
 	}
 	

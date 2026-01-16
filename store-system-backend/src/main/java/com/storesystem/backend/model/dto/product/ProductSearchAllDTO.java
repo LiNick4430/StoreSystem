@@ -16,6 +16,7 @@ public class ProductSearchAllDTO {
 	
 	private Long supplierId;	// 供應商ID
 	
+	// 基本資料
 	private Integer page;		// 頁面 
 	private Integer size;		// 一頁
 	
