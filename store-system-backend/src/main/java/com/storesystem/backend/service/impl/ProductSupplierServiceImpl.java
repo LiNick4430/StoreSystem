@@ -8,13 +8,16 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.storesystem.backend.exception.ProductSupplierLinkException;
 import com.storesystem.backend.model.dto.PageDTO;
 import com.storesystem.backend.model.dto.productSupplier.PSLinkDTO;
 import com.storesystem.backend.model.dto.productSupplier.PSSearchAllDTO;
 import com.storesystem.backend.model.dto.productSupplier.PSUnlinkDTO;
 import com.storesystem.backend.model.dto.productSupplier.PSUpdateCostDTO;
 import com.storesystem.backend.model.dto.productSupplier.ProductSupplierDTO;
+import com.storesystem.backend.model.entity.Product;
 import com.storesystem.backend.model.entity.ProductSupplier;
+import com.storesystem.backend.model.entity.Supplier;
 import com.storesystem.backend.repository.ProductSupplierRepository;
 import com.storesystem.backend.repository.spec.ProductSupplierSpec;
 import com.storesystem.backend.service.ProductSupplierService;
@@ -69,8 +72,27 @@ public class ProductSupplierServiceImpl implements ProductSupplierService{
 
 	@Override
 	public ProductSupplierDTO linkProductAndSupplier(PSLinkDTO dto) {
-		// TODO Auto-generated method stub
-		return null;
+		// 1. 前處理
+		if (productSupplierRepository.existsByProductIdAndSupplierId(dto.getProductId(), dto.getSupplierId()) > 0) {
+			throw new ProductSupplierLinkException("供應商已經進貨該商品");
+		}
+		
+		// 2. 抓取 資料
+		Product product = entityFetcher.getProductById(dto.getProductId());
+		Supplier supplier = entityFetcher.getSupplierById(dto.getSupplierId());
+		
+		// 3. 建立 ps
+		ProductSupplier ps = new ProductSupplier();
+		ps.setDefaultCost(dto.getDefaultCost());
+		
+		// 4. 雙向關聯
+		ps.bindTo(product, supplier);
+		
+		// 5. 儲存關聯 並 回傳
+		ps = productSupplierRepository.save(ps);
+		
+		// 6. 轉成 DTO
+		return modelMapper.map(ps, ProductSupplierDTO.class);
 	}
 
 	@Override

@@ -44,4 +44,13 @@ public class ProductSupplier extends BaseEntity{
 	
 	@Column(name = "default_cost", nullable = false, precision = 10, scale = 2)
 	private BigDecimal defaultCost;		// 供應商 報價
+	
+	// 建立關聯 同時掛載到 商品/供應商 之中
+	public void bindTo(Product product, Supplier supplier) {
+		this.setProduct(product);
+	    this.setSupplier(supplier);
+		
+		product.getProductSuppliers().add(this);
+		supplier.getProductSuppliers().add(this);
+	}
 }

@@ -51,6 +51,15 @@ public class GlobalExceptionHandler {
 		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
 	}
 	
+	// 處理 商品(Product), 供應商(Supplier) 已經關聯 的 異常 (401)
+	@ExceptionHandler(ProductSupplierLinkException.class) 	
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)     		// 401
+	public ApiResponse<?> handleProductSupplierLinkException(ProductSupplierLinkException ex) {
+		int statusCode = HttpStatus.UNAUTHORIZED.value();
+		ErrorCode errorCode = ErrorCode.PRODUCT_SUPPLIER_LINK;
+		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
+	}
+	
 	// 處理 使用 ENUM 卻 找不到 code 的 異常 (401)
 	@ExceptionHandler(EnumNotFoundException.class) 	
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)     		// 401
