@@ -81,12 +81,13 @@ public class ProductTest {
 		Assertions.assertEquals(dto.getPage(), pageDTO.getPage(), "當前頁碼需一致");
 		Assertions.assertTrue(pageDTO.getSize() <= 10, "每頁筆數不應超過 10");
 		
-		// 驗證 搜尋的結果 是不是 空的
 		if (result == ExpectResult.EMPTY) {
+			// 預設 搜尋結果是 空的
 			Assertions.assertTrue(pageDTO.getContent().isEmpty(), "搜尋結果 不是空的不正常");
 		} 
 		else if (result == ExpectResult.NOT_EMPTY) {
-			Assertions.assertFalse(pageDTO.getContent().isEmpty(), "搜尋結果 不應該為空");
+			// 預設 搜尋結果 不是空的
+			Assertions.assertTrue(!pageDTO.getContent().isEmpty(), "搜尋結果 不應該為空");
 		}
 		
 		// 抽查 名字 是否包含在裡面
