@@ -1,5 +1,6 @@
 package com.storesystem.backend.model.entity;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.annotations.SQLRestriction;
@@ -42,6 +43,6 @@ public class Supplier extends BaseEntity{
 	private String phone;			// 供應商 電話
 	
 	@OneToMany(mappedBy = "supplier", fetch = FetchType.LAZY)
-	private Set<ProductSupplier> productSuppliers;
+	private Set<ProductSupplier> productSuppliers = new HashSet<>();
 	
 }

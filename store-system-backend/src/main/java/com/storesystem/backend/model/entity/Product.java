@@ -1,6 +1,7 @@
 package com.storesystem.backend.model.entity;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.annotations.SQLRestriction;
@@ -49,5 +50,5 @@ public class Product extends BaseEntity{
 	private Integer stockQuantity = 0;	// 商品庫存量 預設 0
 	
 	@OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
-	private Set<ProductSupplier> productSuppliers;
+	private Set<ProductSupplier> productSuppliers = new HashSet<>();;
 }
