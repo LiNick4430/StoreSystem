@@ -1,12 +1,16 @@
 package com.storesystem.backend.model.entity;
 
+import java.util.Set;
+
 import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,5 +40,8 @@ public class Supplier extends BaseEntity{
 	
 	@Column(name = "phone", nullable = false, length = 30)
 	private String phone;			// 供應商 電話
+	
+	@OneToMany(mappedBy = "supplier", fetch = FetchType.LAZY)
+	private Set<ProductSupplier> productSuppliers;
 	
 }

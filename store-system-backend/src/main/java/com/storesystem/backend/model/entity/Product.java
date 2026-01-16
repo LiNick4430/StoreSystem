@@ -1,14 +1,17 @@
 package com.storesystem.backend.model.entity;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,4 +47,7 @@ public class Product extends BaseEntity{
 	
 	@Column(name = "stock_quantity", nullable = false)
 	private Integer stockQuantity = 0;	// 商品庫存量 預設 0
+	
+	@OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+	private Set<ProductSupplier> productSuppliers;
 }

@@ -4,10 +4,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.storesystem.backend.exception.ProductNotFoundException;
 import com.storesystem.backend.exception.SupplierExistsException;
 import com.storesystem.backend.exception.SupplierNotFoundException;
 import com.storesystem.backend.model.dto.PageDTO;
@@ -18,8 +18,8 @@ import com.storesystem.backend.model.dto.supplier.SupplierSearchAllDTO;
 import com.storesystem.backend.model.dto.supplier.SupplierSearchDTO;
 import com.storesystem.backend.model.dto.supplier.SupplierUpdateDTO;
 import com.storesystem.backend.model.entity.Supplier;
-import com.storesystem.backend.repository.ProductRepository;
 import com.storesystem.backend.repository.SupplierRepository;
+import com.storesystem.backend.repository.spec.SupplierSpec;
 import com.storesystem.backend.service.SupplierService;
 import com.storesystem.backend.util.PageUtil;
 
@@ -31,10 +31,10 @@ public class SupplierServiceImpl implements SupplierService{
 	private ModelMapper modelMapper;
 
 	@Autowired
-	private SupplierRepository supplierRepository;
-
+	private EntityFetcher entityFetcher;
+	
 	@Autowired
-	private ProductRepository productRepository;
+	private SupplierRepository supplierRepository;
 
 	@Override
 	public PageDTO<SupplierDTO> searchAllSupplier(SupplierSearchAllDTO dto) {
@@ -42,15 +42,13 @@ public class SupplierServiceImpl implements SupplierService{
 		Pageable pageable = PageUtil.getPageable(dto.getPage(), dto.getSize());
 		
 		// 2. 分類執行
-		Page<Supplier> page = null;
+		Specification<Supplier> spec = Specification.unrestricted();
+		
 		if (dto.getProductId() != null) {
-			// 商品ID 查詢
-			productRepository.findById(dto.getProductId()).orElseThrow(() -> new ProductNotFoundException("找不到該商品"));
-			page = supplierRepository.findAllByProductId(dto.getProductId(), pageable);
-		} else {
-			// 無條件查詢
-			page = supplierRepository.findAll(pageable);
+			spec = spec.and(SupplierSpec.hasProductId(dto.getProductId()));
 		}
+		
+		Page<Supplier> page = supplierRepository.findAll(spec, pageable);
 		
 		// 3. 轉成 DTO
 		return PageUtil.toPageDTO(page, supplier -> modelMapper.map(supplier, SupplierDTO.class));
@@ -62,12 +60,10 @@ public class SupplierServiceImpl implements SupplierService{
 		Supplier supplier = null;
 		if (dto.getSupplierId() != null) {
 			// 供應商ID 查詢
-			supplier = supplierRepository.findById(dto.getSupplierId())
-					.orElseThrow(() -> new SupplierNotFoundException("找不到該供應商"));
+			supplier = entityFetcher.getSupplierById(dto.getSupplierId());
 		} else if (dto.getSupplierTaxId() != null) {
 			// 供應商統編 查詢
-			supplier = supplierRepository.findByTaxId(dto.getSupplierTaxId())
-					.orElseThrow(() -> new SupplierNotFoundException("找不到該供應商"));
+			supplier = entityFetcher.getSupplierByTaxId(dto.getSupplierTaxId());
 		} else {
 			// 防呆用 正常流程 不可能到達
 			throw new SupplierNotFoundException("找不到該供應商");
@@ -102,8 +98,7 @@ public class SupplierServiceImpl implements SupplierService{
 	@Override
 	public SupplierDTO updateSupplier(SupplierUpdateDTO dto) {
 		// 1. 搜尋供應商
-		Supplier supplier = supplierRepository.findById(dto.getId())
-				.orElseThrow(() -> new SupplierNotFoundException("找不到該供應商"));
+		Supplier supplier = entityFetcher.getSupplierById(dto.getId());
 
 		// 2. 更新資料
 		supplier.setSupplierName(dto.getName());

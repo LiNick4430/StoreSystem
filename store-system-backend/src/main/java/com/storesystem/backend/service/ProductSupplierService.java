@@ -11,7 +11,7 @@ public interface ProductSupplierService {
 
 	// 搜尋 商品/供應商 旗下對應的 報價
 	/** 包含 無條件, 供應商ID, 供應商統編, 商品ID, 商品條碼, 商品名稱 */
-	PageDTO<ProductSupplierDTO> searchPSAll(PSSearchAllDTO dto);
+	PageDTO<ProductSupplierDTO> searchAllPS(PSSearchAllDTO dto);
 	
 	/*
 	PageDTO<ProductSupplierDTO> findBySupplierIdAndPage();

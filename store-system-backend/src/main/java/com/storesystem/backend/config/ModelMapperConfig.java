@@ -6,8 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.storesystem.backend.model.dto.product.ProductDTO;
+import com.storesystem.backend.model.dto.productSupplier.ProductSupplierDTO;
 import com.storesystem.backend.model.dto.supplier.SupplierDTO;
 import com.storesystem.backend.model.entity.Product;
+import com.storesystem.backend.model.entity.ProductSupplier;
 import com.storesystem.backend.model.entity.Supplier;
 
 @Configuration
@@ -32,6 +34,17 @@ public class ModelMapperConfig {
 		modelMapper.typeMap(Supplier.class, SupplierDTO.class).addMappings(mapper -> {
 			mapper.map(Supplier::getSupplierId, SupplierDTO::setId);
 			mapper.map(Supplier::getSupplierName, SupplierDTO::setName);
+		});
+		
+		modelMapper.typeMap(ProductSupplier.class, ProductSupplierDTO.class).addMappings(mapper -> {
+			mapper.map(src -> src.getProduct().getProductId(), ProductSupplierDTO::setProductId);
+			mapper.map(src -> src.getProduct().getBarcode(), ProductSupplierDTO::setBarcode);
+			mapper.map(src -> src.getProduct().getProductName(), ProductSupplierDTO::setProductName);
+			mapper.map(src -> src.getProduct().getSpec(), ProductSupplierDTO::setSpec);
+			
+			mapper.map(src -> src.getSupplier().getSupplierId(), ProductSupplierDTO::setSupplierId);
+			mapper.map(src -> src.getSupplier().getTaxId(), ProductSupplierDTO::setSupplierTaxID);
+			mapper.map(src -> src.getSupplier().getSupplierName(), ProductSupplierDTO::setSupplierName);
 		});
 		
 		// ------------------------------------------------------------------------------------

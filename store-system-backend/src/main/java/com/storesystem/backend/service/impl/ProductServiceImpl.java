@@ -4,12 +4,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.storesystem.backend.exception.ProductExistsException;
 import com.storesystem.backend.exception.ProductNotFoundException;
-import com.storesystem.backend.exception.SupplierNotFoundException;
 import com.storesystem.backend.model.dto.PageDTO;
 import com.storesystem.backend.model.dto.product.ProductCreateDTO;
 import com.storesystem.backend.model.dto.product.ProductDTO;
@@ -20,7 +20,7 @@ import com.storesystem.backend.model.dto.product.ProductSearchDTO;
 import com.storesystem.backend.model.dto.product.ProductUpdateDTO;
 import com.storesystem.backend.model.entity.Product;
 import com.storesystem.backend.repository.ProductRepository;
-import com.storesystem.backend.repository.SupplierRepository;
+import com.storesystem.backend.repository.spec.ProductSpec;
 import com.storesystem.backend.service.ProductService;
 import com.storesystem.backend.util.PageUtil;
 
@@ -32,10 +32,10 @@ public class ProductServiceImpl implements ProductService{
 	private ModelMapper modelMapper;
 
 	@Autowired
-	private ProductRepository productRepository;
+	private EntityFetcher entityFetcher;
 	
 	@Autowired
-	private SupplierRepository supplierRepository;
+	private ProductRepository productRepository;
 
 	@Override
 	public PageDTO<ProductDTO> searchAllProduct(ProductSearchAllDTO dto) {
@@ -43,19 +43,17 @@ public class ProductServiceImpl implements ProductService{
 		Pageable pageable = PageUtil.getPageable(dto.getPage(), dto.getSize());
 		
 		// 2. 分類執行
-		Page<Product> page = null;
+		Specification<Product> spec = Specification.unrestricted();
+		
 		if (dto.getProductName() != null) {
-			// 相似商品名稱 查詢
-			String nameLike = "%" + dto.getProductName() + "%";
-			page = productRepository.findAllByProductNameLike(nameLike, pageable);
-		} else if (dto.getSupplierId() != null) {
-			// 供應商ID 查詢
-			supplierRepository.findById(dto.getSupplierId()).orElseThrow(() -> new SupplierNotFoundException("找不到該供應商"));
-			page = productRepository.findAllBySupplierId(dto.getSupplierId(), pageable);
-		} else {
-			// 無條件查詢
-			page = productRepository.findAll(pageable);
+			spec = spec.and(ProductSpec.hasProductNameLike(dto.getProductName()));
 		}
+		
+		if (dto.getSupplierId() != null) {
+			spec = spec.and(ProductSpec.hasSupplierId(dto.getSupplierId()));
+		}
+		
+		Page<Product> page = productRepository.findAll(spec, pageable);
 		
 		// 3. 轉成 DTO
 		return PageUtil.toPageDTO(page, product -> modelMapper.map(product, ProductDTO.class));
@@ -67,12 +65,10 @@ public class ProductServiceImpl implements ProductService{
 		Product product = null;
 		if (dto.getProductId() != null) {
 			// 用 商品ID 搜尋
-			product = productRepository.findById(dto.getProductId())
-					.orElseThrow(() -> new ProductNotFoundException("找不到該商品"));
+			product = entityFetcher.getProductById(dto.getProductId());
 		} else if (dto.getBarcode() != null) {
 			// 用 商品條碼 搜尋
-			product = productRepository.findByBarcode(dto.getBarcode())
-					.orElseThrow(() -> new ProductNotFoundException("找不到該商品"));
+			product = entityFetcher.getProductByBarcode(dto.getBarcode());
 		} else {
 			// 防呆用 正常流程 不可能到達
 			throw new ProductNotFoundException("找不到該商品");
@@ -107,8 +103,7 @@ public class ProductServiceImpl implements ProductService{
 	@Override
 	public ProductDTO updateProduct(ProductUpdateDTO dto) {
 		// 1. 尋找商品
-		Product product = productRepository.findById(dto.getId())
-				.orElseThrow(() -> new ProductNotFoundException("找不到該商品"));
+		Product product = entityFetcher.getProductById(dto.getId());
 
 		// 2. 更新資料
 		product.setProductName(dto.getName());
@@ -125,8 +120,7 @@ public class ProductServiceImpl implements ProductService{
 	@Override
 	public ProductDTO setProductSaleStatus(ProductIsForSaleDTO dto) {
 		// 1. 尋找商品
-		Product product = productRepository.findById(dto.getId())
-				.orElseThrow(() -> new ProductNotFoundException("找不到該商品"));
+		Product product = entityFetcher.getProductById(dto.getId());
 
 		// 2. 更新資料
 		product.setIsForSale(dto.getIsForSale());
