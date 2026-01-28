@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.storesystem.backend.exception.ProductNotFoundException;
+import com.storesystem.backend.exception.ProductSupplierLinkException;
 import com.storesystem.backend.exception.SupplierNotFoundException;
 import com.storesystem.backend.model.entity.Product;
+import com.storesystem.backend.model.entity.ProductSupplier;
 import com.storesystem.backend.model.entity.Supplier;
 import com.storesystem.backend.repository.ProductRepository;
 import com.storesystem.backend.repository.ProductSupplierRepository;
@@ -56,5 +58,21 @@ public class EntityFetcher {
 	public Product getProductByBarcode(String barcode) {
 		return productRepository.findByBarcode(barcode)
 				.orElseThrow(() -> new ProductNotFoundException("找不到該商品"));
+	}
+	
+	/**
+	 * 使用 商品 和 供應商 找出 關聯表
+	 * */
+	public ProductSupplier getProductSupplier(Product product, Supplier supplier) {
+		return productSupplierRepository.findByProductAndSupplier(product.getProductId(), supplier.getSupplierId())
+				.orElseThrow(() -> new ProductSupplierLinkException("此商品和供應商無關連"));
+	}
+	
+	/**
+	 * 使用 商品 和 供應商 找出 已經配軟刪除的 關聯表(找不到 回傳空)
+	 * */
+	public ProductSupplier getProductSupplierIsDelete(Product product, Supplier supplier) {
+		return productSupplierRepository.findByProductAndSupplierIsDelete(product.getProductId(), supplier.getSupplierId())
+				.orElse(null);
 	}
 }

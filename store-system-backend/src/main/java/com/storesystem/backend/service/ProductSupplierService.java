@@ -3,6 +3,7 @@ package com.storesystem.backend.service;
 import com.storesystem.backend.model.dto.PageDTO;
 import com.storesystem.backend.model.dto.productSupplier.PSLinkDTO;
 import com.storesystem.backend.model.dto.productSupplier.PSSearchAllDTO;
+import com.storesystem.backend.model.dto.productSupplier.PSUnlinkAfterDTO;
 import com.storesystem.backend.model.dto.productSupplier.PSUnlinkDTO;
 import com.storesystem.backend.model.dto.productSupplier.PSUpdateCostDTO;
 import com.storesystem.backend.model.dto.productSupplier.ProductSupplierDTO;
@@ -29,6 +30,6 @@ public interface ProductSupplierService {
 	ProductSupplierDTO updateDefaultCost(PSUpdateCostDTO dto);
 	
 	// 刪除 商品與供應商 關聯
-	void unlinkProductAndSupplier(PSUnlinkDTO dto);
+	PSUnlinkAfterDTO unlinkProductAndSupplier(PSUnlinkDTO dto);
 	
 }

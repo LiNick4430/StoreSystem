@@ -9,10 +9,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PSFindByPruductName {
+public class PSFindByProductBarcode {
 
-	@NotBlank(message = "缺少商品名稱")
-	private String productName;	// 商品名稱
+	@NotBlank(message = "缺少商品條碼")
+	private String productBarcode;	// 商品條碼
 	
 	@NotNull(message = "缺少頁碼")
 	private Integer page;	// 頁面 

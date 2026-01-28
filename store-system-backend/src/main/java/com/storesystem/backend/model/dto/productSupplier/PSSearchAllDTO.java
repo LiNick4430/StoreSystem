@@ -46,7 +46,7 @@ public class PSSearchAllDTO {
 		return search;
 	}
 	
-	public static PSSearchAllDTO from(PSFindByPruductId dto) {
+	public static PSSearchAllDTO from(PSFindByProductId dto) {
 		PSSearchAllDTO search = new PSSearchAllDTO();
 		search.setProductId(dto.getProductId());
 		search.setPage(dto.getPage());
@@ -54,7 +54,7 @@ public class PSSearchAllDTO {
 		return search;
 	}
 	
-	public static PSSearchAllDTO from(PSFindByPruductName dto) {
+	public static PSSearchAllDTO from(PSFindByProductName dto) {
 		PSSearchAllDTO search = new PSSearchAllDTO();
 		search.setProductName(dto.getProductName());
 		search.setPage(dto.getPage());
@@ -62,7 +62,7 @@ public class PSSearchAllDTO {
 		return search;
 	}
 	
-	public static PSSearchAllDTO from(PSFindByPruductBarcode dto) {
+	public static PSSearchAllDTO from(PSFindByProductBarcode dto) {
 		PSSearchAllDTO search = new PSSearchAllDTO();
 		search.setProductBarcode(dto.getProductBarcode());
 		search.setPage(dto.getPage());

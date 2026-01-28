@@ -1,5 +1,7 @@
 package com.storesystem.backend.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,4 +30,20 @@ public interface ProductSupplierRepository extends JpaRepository<ProductSupplier
 	long existsByProductIdAndSupplierId(@Param("productId") Long productId,
 										@Param("supplierId") Long supplierId);
 	
+	
+	@Query(value = "SELECT * FROM product_supplier "
+			+ "WHERE supplier_id = :supplierId "
+			+ "AND product_id = :productId "
+			+ "AND delete_at IS NULL ",
+			nativeQuery = true)
+	Optional<ProductSupplier> findByProductAndSupplier(@Param("productId") Long productId,
+														@Param("supplierId") Long supplierId);
+	
+	@Query(value = "SELECT * FROM product_supplier "
+			+ "WHERE supplier_id = :supplierId "
+			+ "AND product_id = :productId "
+			+ "AND delete_at IS NOT NULL ",
+			nativeQuery = true)
+	Optional<ProductSupplier> findByProductAndSupplierIsDelete(@Param("productId") Long productId,
+																@Param("supplierId") Long supplierId);
 }

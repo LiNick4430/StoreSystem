@@ -3,122 +3,80 @@ package com.storesystem.backend.exception;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.storesystem.backend.response.ApiResponse;
 
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Path;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-	// 處理 商品(Product) 找不到 的 異常 (401)
-	@ExceptionHandler(ProductNotFoundException.class) 	
-	@ResponseStatus(HttpStatus.UNAUTHORIZED)     		// 401
-	public ApiResponse<?> handleProductNotFoundException(ProductNotFoundException ex) {
-		int statusCode = HttpStatus.UNAUTHORIZED.value();
-		ErrorCode errorCode = ErrorCode.PRODUCT_NOT_FOUND;
-		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
+	
+	// 負責處理 全部的 自定義 錯誤
+	@ExceptionHandler(BaseException.class)
+	public ResponseEntity<ApiResponse<?>> handleBaseException(BaseException ex) {
+		// 包裝 ResponseEntity 回傳
+		return ResponseEntity
+				// 控制 ResponseStatus
+				.status(ex.getStatus())								
+				// 放入 ApiResponse
+				.body(ApiResponse.error(
+						ex.getStatus().value(), 	
+						ex.getMessage(), 
+						ex.getErrorCode()));
 	}
 	
-	// 處理 商品(Product) 已經存在 的 異常 (401)
-	@ExceptionHandler(ProductExistsException.class) 	
-	@ResponseStatus(HttpStatus.UNAUTHORIZED)     		// 401
-	public ApiResponse<?> handleProductExistsException(ProductExistsException ex) {
-		int statusCode = HttpStatus.UNAUTHORIZED.value();
-		ErrorCode errorCode = ErrorCode.PRODUCT_EXISTS;
-		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
-	}
-	
-	// 處理 供應商(Supplier) 找不到 的 異常 (401)
-	@ExceptionHandler(SupplierNotFoundException.class) 	
-	@ResponseStatus(HttpStatus.UNAUTHORIZED)     		// 401
-	public ApiResponse<?> handleSupplierNotFoundException(SupplierNotFoundException ex) {
-		int statusCode = HttpStatus.UNAUTHORIZED.value();
-		ErrorCode errorCode = ErrorCode.SUPPLIER_NOT_FOUND;
-		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
-	}
-	
-	// 處理 供應商(Supplier) 已經存在 的 異常 (401)
-	@ExceptionHandler(SupplierExistsException.class) 	
-	@ResponseStatus(HttpStatus.UNAUTHORIZED)     		// 401
-	public ApiResponse<?> handleSupplierExistsException(SupplierExistsException ex) {
-		int statusCode = HttpStatus.UNAUTHORIZED.value();
-		ErrorCode errorCode = ErrorCode.SUPPLIER_EXISTS;
-		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
-	}
-	
-	// 處理 商品(Product), 供應商(Supplier) 已經關聯 的 異常 (401)
-	@ExceptionHandler(ProductSupplierLinkException.class) 	
-	@ResponseStatus(HttpStatus.UNAUTHORIZED)     		// 401
-	public ApiResponse<?> handleProductSupplierLinkException(ProductSupplierLinkException ex) {
-		int statusCode = HttpStatus.UNAUTHORIZED.value();
-		ErrorCode errorCode = ErrorCode.PRODUCT_SUPPLIER_LINK;
-		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
-	}
-	
-	// 處理 使用 ENUM 卻 找不到 code 的 異常 (401)
-	@ExceptionHandler(EnumNotFoundException.class) 	
-	@ResponseStatus(HttpStatus.UNAUTHORIZED)     		// 401
-	public ApiResponse<?> handleEnumNotFoundException(EnumNotFoundException ex) {
-		int statusCode = HttpStatus.UNAUTHORIZED.value();
-		ErrorCode errorCode = ErrorCode.ENUM_NOT_FOUND;
-		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
-	}
-
-	// 處理 缺少特定數值 的 異常 (400)
-	@ExceptionHandler(ValueMissException.class) 	
-	@ResponseStatus(HttpStatus.BAD_REQUEST)     		// 400
-	public ApiResponse<?> handleValueMissException(ValueMissException ex) {
-		int statusCode = HttpStatus.BAD_REQUEST.value();
-		ErrorCode errorCode = ErrorCode.VALUES_MISS;
-		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
-	}
-	
-	// 處理 統編規格 錯誤 的 異常 (400)
-	@ExceptionHandler(TaxIdErrorException.class) 	
-	@ResponseStatus(HttpStatus.BAD_REQUEST)     		// 400
-	public ApiResponse<?> handleTaxIdErrorException(TaxIdErrorException ex) {
-		int statusCode = HttpStatus.BAD_REQUEST.value();
-		ErrorCode errorCode = ErrorCode.TAX_ID_ERROR;
-		return ApiResponse.error(statusCode, ex.getMessage(), errorCode);
-	}
-	
+	// 非自定義錯誤 -----------------------------------------------------------------------------------------------------
 	// 處理 BEAN VALIDATION 統一處理的 缺少特定數值 的 異常 (400)
 	// 針對 @RequestBody @Valid DTO
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST)     		// 400
-	public ApiResponse<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+	public ResponseEntity<ApiResponse<?>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
 		// 1. 取得所有欄位的錯誤訊息
 	    String errorMessage = ex.getBindingResult().getFieldErrors().stream()
 	            .map(error -> error.getField() + ": " + error.getDefaultMessage())
-	            .collect(Collectors.joining(", "));
+	            .collect(Collectors.joining("; "));
 		
-		int statusCode = HttpStatus.BAD_REQUEST.value();
-		ErrorCode errorCode = ErrorCode.VALID_ERROR;
-		return ApiResponse.error(statusCode, errorMessage, errorCode);
+		return ResponseEntity
+				.status(HttpStatus.BAD_REQUEST)
+				.body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), errorMessage, ErrorCode.VALID_ERROR));
 	}
 	
 	// 處理 BEAN VALIDATION 統一處理的 缺少特定數值 的 異常 (400)
 	// 針對 @Validated @RequestParam / @PathVariable
 	@ExceptionHandler(ConstraintViolationException.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST)     		// 400
-	public ApiResponse<?> handleConstraintViolationException(ConstraintViolationException ex) {
+	public ResponseEntity<ApiResponse<?>> handleConstraintViolationException(ConstraintViolationException ex) {
 		// 1. 取得所有欄位的錯誤訊息
 		String errorMessage = ex.getConstraintViolations().stream()
 	            .map(violation -> {
-	                // 透過迭代取出路徑的最後一個節點（即參數名）
-	                String propertyPath = violation.getPropertyPath().toString();
-	                String fieldName = propertyPath.substring(propertyPath.lastIndexOf('.') + 1);
+	            	String fieldName = "";
+	                for (Path.Node node : violation.getPropertyPath()) {
+	                    fieldName = node.getName();
+	                }
 	                return fieldName + ": " + violation.getMessage();
 	            })
-	            .collect(Collectors.joining(", "));
+	            .collect(Collectors.joining("; "));
 		
-		int statusCode = HttpStatus.BAD_REQUEST.value();
-		ErrorCode errorCode = ErrorCode.VALID_ERROR;
-		return ApiResponse.error(statusCode, errorMessage, errorCode);
+		return ResponseEntity
+				.status(HttpStatus.BAD_REQUEST)
+				.body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), errorMessage, ErrorCode.VALID_ERROR));
+	}
+	
+	// 其他 非預期性的錯誤 (500)
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ApiResponse<?>> handleException(Exception ex) {
+		log.error("系統發生非預期錯誤: ", ex);
+		
+		return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error(
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+                        "系統發生非預期錯誤，請聯繫管理員", 
+                        ErrorCode.SYSTEM_ERROR));
 	}
 }

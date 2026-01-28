@@ -1,5 +1,7 @@
 package com.storesystem.backend.service.impl;
 
+import java.time.LocalDateTime;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,9 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.storesystem.backend.exception.ProductSupplierLinkException;
+import com.storesystem.backend.exception.ProductSupplierNotFoundException;
 import com.storesystem.backend.model.dto.PageDTO;
 import com.storesystem.backend.model.dto.productSupplier.PSLinkDTO;
 import com.storesystem.backend.model.dto.productSupplier.PSSearchAllDTO;
+import com.storesystem.backend.model.dto.productSupplier.PSUnlinkAfterDTO;
 import com.storesystem.backend.model.dto.productSupplier.PSUnlinkDTO;
 import com.storesystem.backend.model.dto.productSupplier.PSUpdateCostDTO;
 import com.storesystem.backend.model.dto.productSupplier.ProductSupplierDTO;
@@ -66,7 +70,12 @@ public class ProductSupplierServiceImpl implements ProductSupplierService{
 		
 		Page<ProductSupplier> page = productSupplierRepository.findAll(spec, pageable);
 		
-		// 3. 轉成 DTO
+		// 3. 檢查是否有資料
+		if (page.isEmpty()) {
+			throw new ProductSupplierNotFoundException("無滿足此條件的結果");
+		}
+		
+		// 4. 轉成 DTO
 		return PageUtil.toPageDTO(page, ps -> modelMapper.map(ps, ProductSupplierDTO.class));
 	}
 
@@ -81,12 +90,26 @@ public class ProductSupplierServiceImpl implements ProductSupplierService{
 		Product product = entityFetcher.getProductById(dto.getProductId());
 		Supplier supplier = entityFetcher.getSupplierById(dto.getSupplierId());
 		
-		// 3. 建立 ps
-		ProductSupplier ps = new ProductSupplier();
-		ps.setDefaultCost(dto.getDefaultCost());
+		// 3. 檢查 有 被刪除的 關連
+		ProductSupplier existingDeleted = entityFetcher.getProductSupplierIsDelete(product, supplier);
+		ProductSupplier ps = null;
 		
-		// 4. 雙向關聯
-		ps.bindTo(product, supplier);
+		if (existingDeleted != null) {
+			// 4-1. 假設存在 就 取消刪除 並 拿來回來用
+			ps = existingDeleted;
+			ps.setDeleteAt(null);
+			ps.setDefaultCost(dto.getDefaultCost());
+			
+			// 4-2. 雙向關聯
+			ps.bindTo(product, supplier);
+		} else {
+			// 4-1. 不存在 則 建立 新的 ps
+			ps = new ProductSupplier();
+			ps.setDefaultCost(dto.getDefaultCost());
+			
+			// 4-2. 雙向關聯
+			ps.bindTo(product, supplier);
+		}
 		
 		// 5. 儲存關聯 並 回傳
 		ps = productSupplierRepository.save(ps);
@@ -97,14 +120,40 @@ public class ProductSupplierServiceImpl implements ProductSupplierService{
 
 	@Override
 	public ProductSupplierDTO updateDefaultCost(PSUpdateCostDTO dto) {
-		// TODO Auto-generated method stub
-		return null;
+		// 1. 抓取 資料
+		Product product = entityFetcher.getProductById(dto.getProductId());
+		Supplier supplier = entityFetcher.getSupplierById(dto.getSupplierId());
+		ProductSupplier productSupplier = entityFetcher.getProductSupplier(product, supplier);
+		
+		// 2. 修改資料
+		productSupplier.setDefaultCost(dto.getDefaultCost());
+		
+		// 3. 儲存資料
+		productSupplier = productSupplierRepository.save(productSupplier);
+		
+		// 4. 轉成 DTO
+		return modelMapper.map(productSupplier, ProductSupplierDTO.class);
 	}
 
 	@Override
-	public void unlinkProductAndSupplier(PSUnlinkDTO dto) {
-		// TODO Auto-generated method stub
+	public PSUnlinkAfterDTO unlinkProductAndSupplier(PSUnlinkDTO dto) {
+		// 1. 抓取 資料
+		Product product = entityFetcher.getProductById(dto.getProductId());
+		Supplier supplier = entityFetcher.getSupplierById(dto.getSupplierId());
+		ProductSupplier productSupplier = entityFetcher.getProductSupplier(product, supplier);
 		
+		// 2. 解除關聯
+		productSupplier.unBind();
+		
+		// 3. 軟刪除
+		productSupplier.setDeleteAt(LocalDateTime.now());
+		
+		// 4. 回存
+		productSupplier = productSupplierRepository.save(productSupplier);
+		
+		// 5. 返回資料
+		return new PSUnlinkAfterDTO(productSupplier.getSupplier().getSupplierName(), 
+									productSupplier.getProduct().getProductName());
 	}
 
 }

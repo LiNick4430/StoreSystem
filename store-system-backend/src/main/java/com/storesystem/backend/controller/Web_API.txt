@@ -26,3 +26,19 @@ POST	findByTaxId							-> "/find/tax/id"
 POST	createSupplier						-> "/create"
 POST	updateSupplier						-> "/update"
 DELETE	deleteSupplier						-> "/delete"
+
+================================================================================
+PSController
+@RequestMapping("/ps")
+
+POST	findAllPS							-> "/find/all/page"
+POST	findAllPSBySuppierId				-> "/find/all/supplier/id/page"
+POST	findAllPSBySuppierTaxId				-> "/find/all/supplier/tax/id/page"
+POST	findAllPSByProductId				-> "/find/all/product/id/page"
+POST	findAllPSByProductName				-> "/find/all/product/name/page"
+POST	findAllPSByProductBarcode			-> "/find/all/product/barcode/page"
+POST	linkPS								-> "/link"
+POST	undatePSCost						-> "/update"
+DELETE	unLink								-> "/unlink"
+
+
