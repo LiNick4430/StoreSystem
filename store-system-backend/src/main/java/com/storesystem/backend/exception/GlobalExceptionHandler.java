@@ -14,7 +14,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Path;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+@Slf4j					// lombok 支援的 log
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 	
