@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,13 +54,17 @@ public class ProductServiceUnitTest {
 		dto.setSpec("測試規格");
 		dto.setPrice(new BigDecimal("150.00"));
 		
-		// 模擬：當 Repository 檢查條碼時，回傳 0 (代表沒重複)
-		when(productRepository.existsByBarcodeIncludingDeleted(dto.getBarcode())).thenReturn(0L);
+		// 模擬：當 Repository 檢查條碼時
+		when(productRepository.existsByBarcode(dto.getBarcode())).thenReturn(Optional.empty());
 		/* 對應 service：
-		 * if (productRepository.existsByBarcodeIncludingDeleted(barcode) > 0) {
-		 * 		throw new ProductExistsException();
-		 * }
+		 * productRepository.existsByBarcode(barcode)
+				.ifPresent(found -> {
+					throw new ProductExistsException("商品條碼已經被使用");
+			});
     	*/
+		
+		// 模擬已刪除檢查 (如果是全新商品，回傳 null)
+		when(entityFetcher.getProductByBarcodeIsDelete(dto.getBarcode())).thenReturn(null);
 		
 		// 模擬：當 Repository 儲存時，回傳儲存後的物件
 	    when(productRepository.save(any(Product.class))).thenAnswer(i -> i.getArguments()[0]);
@@ -80,7 +85,7 @@ public class ProductServiceUnitTest {
 	    assertNotNull(result);
 	    
 	    // Verify 行為
-	    verify(productRepository).existsByBarcodeIncludingDeleted("12345");	// 有先檢查條碼
+	    verify(productRepository).existsByBarcode(dto.getBarcode());	// 有先檢查條碼
 	    verify(productRepository, times(1)).save(any(Product.class));		// 有成功存
 	    verify(modelMapper).map(any(Product.class), eq(ProductDTO.class));	// 有轉 DTO
 	}
@@ -92,7 +97,7 @@ public class ProductServiceUnitTest {
 	    dto.setBarcode("EXIST_BARCODE");
 	    
 	    // 模擬：條碼已存在 (回傳 1)
-	    when(productRepository.existsByBarcodeIncludingDeleted("EXIST_BARCODE")).thenReturn(1L);
+	    when(productRepository.existsByBarcode(dto.getBarcode())).thenReturn(Optional.of(1));
 
 	    // 2. Act & Assert (驗證是否拋出正確的異常)
 	    assertThrows(ProductExistsException.class, () -> {
