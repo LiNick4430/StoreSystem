@@ -82,9 +82,10 @@ public class ProductSupplierServiceImpl implements ProductSupplierService{
 	@Override
 	public ProductSupplierDTO linkProductAndSupplier(PSLinkDTO dto) {
 		// 1. 前處理
-		if (productSupplierRepository.existsByProductIdAndSupplierId(dto.getProductId(), dto.getSupplierId()) > 0) {
-			throw new ProductSupplierLinkException("供應商已經進貨該商品");
-		}
+		productSupplierRepository.existsByProductIdAndSupplierId(dto.getProductId(), dto.getSupplierId())
+			.ifPresent(found -> {
+				throw new ProductSupplierLinkException("供應商已經進貨該商品");
+			});
 		
 		// 2. 抓取 資料
 		Product product = entityFetcher.getProductById(dto.getProductId());

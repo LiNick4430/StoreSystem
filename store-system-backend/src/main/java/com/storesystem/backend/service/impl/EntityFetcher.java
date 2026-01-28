@@ -61,6 +61,14 @@ public class EntityFetcher {
 	}
 	
 	/**
+	 * 使用 商品條碼 找尋 已經配軟刪除的 商品(找不到 回傳空)
+	 * */
+	public Product getProductByBarcodeIsDelete(String barcode) {
+		return productRepository.findByBarcodeIsDelete(barcode)
+				.orElse(null);
+	}
+	
+	/**
 	 * 使用 商品 和 供應商 找出 關聯表
 	 * */
 	public ProductSupplier getProductSupplier(Product product, Supplier supplier) {

@@ -22,15 +22,16 @@ public interface ProductSupplierRepository extends JpaRepository<ProductSupplier
 	Page<ProductSupplier> findAll(Specification<ProductSupplier> spec, Pageable pageable);
 	
 	/** 自訂 檢查 供應商 + 商品 是否 已經關聯 */
-	@Query(value = "SELECT COUNT(*) FROM product_supplier "
+	@Query(value = "SELECT 1 FROM product_supplier "
 			+ "WHERE product_id = :productId "
 			+ "AND supplier_id = :supplierId "
-			+ "AND delete_at IS NULL ",
+			+ "AND delete_at IS NULL "
+			+ "LIMIT 1 ",
 			nativeQuery = true)
-	long existsByProductIdAndSupplierId(@Param("productId") Long productId,
-										@Param("supplierId") Long supplierId);
+	Optional<Integer> existsByProductIdAndSupplierId(@Param("productId") Long productId,
+													@Param("supplierId") Long supplierId);
 	
-	
+	/** 自訂 獲得 供應商 + 商品 的關聯表 */
 	@Query(value = "SELECT * FROM product_supplier "
 			+ "WHERE supplier_id = :supplierId "
 			+ "AND product_id = :productId "
@@ -39,6 +40,7 @@ public interface ProductSupplierRepository extends JpaRepository<ProductSupplier
 	Optional<ProductSupplier> findByProductAndSupplier(@Param("productId") Long productId,
 														@Param("supplierId") Long supplierId);
 	
+	/** 自訂 獲得 供應商 + 商品 已經被刪除的 關聯表 */
 	@Query(value = "SELECT * FROM product_supplier "
 			+ "WHERE supplier_id = :supplierId "
 			+ "AND product_id = :productId "
@@ -46,4 +48,20 @@ public interface ProductSupplierRepository extends JpaRepository<ProductSupplier
 			nativeQuery = true)
 	Optional<ProductSupplier> findByProductAndSupplierIsDelete(@Param("productId") Long productId,
 																@Param("supplierId") Long supplierId);
+	
+	/** 自訂 使用 商品 看是否存在 關聯表 */
+	@Query(value = "SELECT 1 FROM product_supplier "
+			+ "WHERE product_id = :productId "
+			+ "AND delete_at IS NULL "
+			+ "LIMIT 1 ",
+			nativeQuery = true)
+	Optional<Integer> existsProductHasSupplier(@Param("productId") Long productId);
+	
+	/** 自訂 使用 供應商 看是否存在 關聯表 */
+	@Query(value = "SELECT 1 FROM product_supplier "
+			+ "WHERE supplier_id = :supplierId"
+			+ "AND delete_at IS NULL "
+			+ "LIMIT 1 ",
+			nativeQuery = true)
+	Optional<Integer> existsSupplierHasProduct(@Param("supplierId") Long supplierId);
 }
