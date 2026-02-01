@@ -4,6 +4,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -33,6 +34,14 @@ public class GlobalExceptionHandler {
 	}
 	
 	// 非自定義錯誤 -----------------------------------------------------------------------------------------------------
+	// 處理 序列化反序列化 的錯誤 (400)
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<ApiResponse<?>> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+		return ResponseEntity
+				.status(HttpStatus.BAD_REQUEST)
+				.body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), "輸入格式錯誤，請確認欄位型別是否正確（例如 ID 需為數字）", ErrorCode.VALID_ERROR));
+	} 
+	
 	// 處理 BEAN VALIDATION 統一處理的 缺少特定數值 的 異常 (400)
 	// 針對 @RequestBody @Valid DTO
 	@ExceptionHandler(MethodArgumentNotValidException.class)

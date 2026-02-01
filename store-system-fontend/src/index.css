@@ -1,0 +1,13 @@
+/* 隱藏 Chrome, Safari, Edge 的數字箭頭 */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: textfield;
+  margin: 0;
+}
+
+/* 隱藏 Firefox 的數字箭頭 */
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
