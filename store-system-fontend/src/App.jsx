@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 
-import { searchAll } from './services/productService'
+import { searchAllProduct } from './services/productService'
 
 function App() {
   // 資料狀態
@@ -17,7 +17,7 @@ function App() {
   // 定義 抓取資料函式
   const fetchData = async () => {
     try {
-      const response = await searchAll(searchType, searchKeyWord, page, size);
+      const response = await searchAllProduct(searchType, searchKeyWord, page, size);
 
       if (response && response.data) {
         setProducts(response.data.content || []);

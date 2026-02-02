@@ -1,57 +1,125 @@
-const API_BASE_URL = "http://localhost:8080";
+import { request } from '../api/apiClinet'
+import { searchAllMap, searchMap } from '../api/product/product.api'
+
 const SERVICE_BASE_URL = "/product";
 
 /** 
- * 搜尋商品 
+ * 搜尋大量商品
+ * @param {string} type 搜尋方式
+ * @param {string | number} keyword 供應商ID(number) 或 商品名稱(string)
  * @param {number} page 頁碼
  * @param {number} size 大小
  * @returns {Promise<Object>} 該頁的資料
 */
-export const searchAll = async (type, keyword, page, size) => {
+export const searchAllProduct = async (type, keyword, page, size) => {
   // 1. 建立基本設定檔
+  const api = searchAllMap[type];
+  if (!api) {
+    throw new Error(`未知的搜尋類型: ${type}`);
+  }
+
   const config = {
     method: 'POST',
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: 'include'
+    body: JSON.stringify(api.buildBody({ keyword, page, size }))
   };
 
-  // 2. 根據 type 分流
-  let url = '';
+  // 2. 執行 API
+  return request(SERVICE_BASE_URL, api.url, config);
+};
 
-  if (type === 'all') {
-    config.body = JSON.stringify({ page, size });
-    url = '/find/all/page';
-  } else if (type === 'name') {
-    config.body = JSON.stringify({ name: keyword, page, size });
-    url = '/find/all/product/name/page';
-  } else if (type === 'supplier') {
-    config.body = JSON.stringify({ supplierId: keyword, page, size });
-    url = '/find/all/supplier/page';
+/** 
+ * 搜尋單一商品
+ * @param {string} type 搜尋方式
+ * @param {string | number} keyword 商品ID(number) 或 商品條碼(string)
+ * @returns {Promise<Object>} 商品資料
+*/
+export const searchProduct = async (type, keyword) => {
+  // 1. 建立基本設定檔
+  const api = searchMap[type];
+  if (!api) {
+    throw new Error(`未知的搜尋類型: ${type}`);
   }
 
-  // 3. 執行 API + 處理 結果
-  const response = await fetch(`${API_BASE_URL}${SERVICE_BASE_URL}${url}`, config);
+  const config = {
+    method: 'POST',
+    body: JSON.stringify(api.buildBody({ keyword }))
+  };
 
-  let responseData = null;
-  try {
-    responseData = await response.json();
-  } catch (e) {
-    console.warn(`搜尋商品 Response Body 無法解析為 JSON 或為空。`, e);
-  }
+  // 2. 執行 API
+  return request(SERVICE_BASE_URL, api.url, config);
+};
 
-  if (!response.ok) {
-    if (responseData && responseData.message) {
-      throw new Error(`錯誤類型：${responseData.errorCode}, 錯誤訊息：${responseData.message}`);
-    } else {
-      throw new Error(`網路錯誤，無法連接伺服器或解析錯誤訊息。狀態碼: ${response.status}`);
-    }
-  }
+/**
+ * 建立新的商品
+ * @param {string} productName 商品名稱
+ * @param {string} barcode 商品條碼
+ * @param {string} spec 商品規格
+ * @param {number} price 商品售價
+ * @returns {Promise<Object>} 商品資料
+*/
+export const createProduct = async (productName, barcode, spec, price) => {
+  // 1. 建立基本設定檔
+  const url = '/create';
+  const config = {
+    method: 'POST',
+    body: JSON.stringify({ name: productName, barcode, spec, price })
+  };
 
-  if (responseData.code !== 200) {
-    throw new Error(responseData.message || "搜尋成功後，業務碼異常。");
-  }
+  // 2. 執行 API
+  return request(SERVICE_BASE_URL, url, config);
+};
 
-  return responseData;
+/**
+ * 更新 商品內容
+ * @param {number} id 商品ID
+ * @param {string} productName 商品名稱
+ * @param {string} spec 商品規格
+ * @param {number} price 商品售價
+ * @returns {Promise<Object>} 商品資料
+ */
+export const updateProduct = async (id, productName, spec, price) => {
+  // 1. 建立基本設定檔
+  const url = '/update';
+  const config = {
+    method: 'POST',
+    body: JSON.stringify({ id, name: productName, spec, price })
+  };
+
+  // 2. 執行 API
+  return request(SERVICE_BASE_URL, url, config);
+};
+
+/**
+ * 更新商品銷售狀態
+ * @param {number} id 商品ID
+ * @param {boolean} isForSale 更新後的銷售狀態 (true = 銷售中, false = 不販售)
+ * @returns {Promise<Object>} 商品資料
+ */
+export const setProductSaleStatus = async (id, isForSale) => {
+  // 1. 建立基本設定檔
+  const url = '/set/sale/status';
+  const config = {
+    method: 'POST',
+    body: JSON.stringify({ id, isForSale })
+  };
+
+  // 2. 執行 API
+  return request(SERVICE_BASE_URL, url, config);
+};
+
+/**
+ * 刪除商品
+ * @param {number} id 商品ID
+ * @returns {Promise<void>} 刪除訊息
+ */
+export const deleteProduct = async (id) => {
+  // 1. 建立基本設定檔
+  const url = '/delete';
+  const config = {
+    method: 'DELETE',
+    body: JSON.stringify({ id })
+  };
+
+  // 2. 執行 API
+  return request(SERVICE_BASE_URL, url, config);
 };
