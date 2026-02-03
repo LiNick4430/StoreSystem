@@ -33,8 +33,8 @@ import jakarta.validation.Valid;
  * POST	findAllPSByProductName				-> "/find/all/product/name/page"
  * POST	findAllPSByProductBarcode			-> "/find/all/product/barcode/page"
  * POST	linkPS								-> "/link"
- * POST	undatePSCost						-> "/update"
- * POST	unLink							-> "/unlink"
+ * POST	updatePSCost						-> "/update"
+ * POST	unLink								-> "/unlink"
  * */
 
 @RestController
@@ -87,7 +87,7 @@ public class PSController {
 	}
 	
 	@PostMapping("/update")
-	public ApiResponse<ProductSupplierDTO> undatePSCost(@Valid @RequestBody PSUpdateCostDTO dto) {
+	public ApiResponse<ProductSupplierDTO> updatePSCost(@Valid @RequestBody PSUpdateCostDTO dto) {
 		ProductSupplierDTO psDTO = productSupplierService.updateDefaultCost(dto);
 		return ApiResponse.success("關聯報價 修改成功", psDTO);
 	}

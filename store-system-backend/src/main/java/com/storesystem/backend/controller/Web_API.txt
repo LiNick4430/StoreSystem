@@ -38,7 +38,7 @@ POST	findAllPSByProductId				-> "/find/all/product/id/page"
 POST	findAllPSByProductName				-> "/find/all/product/name/page"
 POST	findAllPSByProductBarcode			-> "/find/all/product/barcode/page"
 POST	linkPS								-> "/link"
-POST	undatePSCost						-> "/update"
+POST	updatePSCost						-> "/update"
 POST	unLink								-> "/unlink"
 
 
