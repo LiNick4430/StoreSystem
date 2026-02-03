@@ -27,9 +27,18 @@ public interface SupplierRepository extends JpaRepository<Supplier, Long>, JpaSp
 	/** 標準 使用供應商統編 搜尋供應商 */
 	Optional<Supplier> findByTaxId(String taxId);
 	
-	/** 自訂 檢查 供應商統編 是否 已經存在(包含已經軟刪除的) */
-	@Query(value = "SELECT COUNT(*) FROM suppliers "
-			+ "WHERE tax_id = :taxId",
+	/** 自訂 使用 供應商統編 搜尋 已經 軟刪除的 供應商 */
+	@Query(value = "SELECT * FROM suppliers "
+			+ "WHERE tax_id = :taxId "
+			+ "AND delete_at IS NOT NULL ",
 			nativeQuery = true)
-	long existsByTaxIdIncludingDeleted(@Param("taxId") String taxId);
+	Optional<Supplier> findByTaxIdIsDelete(@Param("taxId") String taxId);
+	
+	/** 自訂 檢查 供應商統編 是否 已經存在 */
+	@Query(value = "SELECT 1 FROM suppliers "
+			+ "WHERE tax_id = :taxId "
+			+ "AND delete_at IS NULL "
+			+ "LIMIT 1 ",
+			nativeQuery = true)
+	Optional<Integer> existsByTaxId(@Param("taxId") String taxId);
 }

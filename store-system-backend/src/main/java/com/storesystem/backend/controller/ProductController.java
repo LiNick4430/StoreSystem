@@ -1,7 +1,6 @@
 package com.storesystem.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +35,7 @@ import jakarta.validation.Valid;
  * POST 	createProdcut 						->	"/create"
  * POST 	updateProduct 						->	"/update"
  * POST 	setProductSaleStatus 				->	"/set/sale/status"
- * DELETE 	deleteProduct 						->	"/delete"
+ * POST 	deleteProduct 						->	"/delete"
  * 
  * Outside
  * */
@@ -97,7 +96,7 @@ public class ProductController {
 		return ApiResponse.success("商品狀態 更新為 " + message + " 成功", productDTO);
 	}
 	
-	@DeleteMapping("/delete")
+	@PostMapping("/delete")
 	public ApiResponse<Void> deleteProduct(@Valid @RequestBody ProductDeleteDTO dto) {
 		productService.deleteProduct(dto);
 		return ApiResponse.success("商品 刪除成功", null);

@@ -1,7 +1,6 @@
 package com.storesystem.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +30,7 @@ import jakarta.validation.Valid;
  * POST		findByTaxId							-> "/find/tax/id"
  * POST		createSupplier						-> "/create"
  * POST		updateSupplier						-> "/update"
- * DELETE	deleteSupplier						-> "/delete"
+ * POST		deleteSupplier						-> "/delete"
  * */
 
 @RestController
@@ -77,7 +76,7 @@ public class SupplierController {
 		return ApiResponse.success("供應商資訊 更新成功", supplierDTO);
 	}
 	
-	@DeleteMapping("/update")
+	@PostMapping("/delete")
 	public ApiResponse<Void> deleteSupplier(@Valid @RequestBody SupplierDeleteDTO dto) {
 		supplierService.deleteSupplier(dto);
 		return ApiResponse.success("供應商 刪除成功", null);

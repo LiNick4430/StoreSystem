@@ -1,7 +1,6 @@
 package com.storesystem.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +34,7 @@ import jakarta.validation.Valid;
  * POST	findAllPSByProductBarcode			-> "/find/all/product/barcode/page"
  * POST	linkPS								-> "/link"
  * POST	undatePSCost						-> "/update"
- * DELETE	unLink							-> "/unlink"
+ * POST	unLink							-> "/unlink"
  * */
 
 @RestController
@@ -93,7 +92,7 @@ public class PSController {
 		return ApiResponse.success("關聯報價 修改成功", psDTO);
 	}
 	
-	@DeleteMapping("/unlink")
+	@PostMapping("/unlink")
 	public ApiResponse<PSUnlinkAfterDTO> unLink(@Valid @RequestBody PSUnlinkDTO dto) {
 		PSUnlinkAfterDTO psUnlinkAfterDTO = productSupplierService.unlinkProductAndSupplier(dto);
 		return ApiResponse.success(String.format("供應商：%s, 商品：%s 關聯取消 成功", psUnlinkAfterDTO.getSupplierName(), psUnlinkAfterDTO.getProductName()), null);

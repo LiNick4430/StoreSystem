@@ -37,7 +37,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 	@Query(value = "SELECT 1 FROM product "
 			+ "WHERE barcode = :barcode "
 			+ "AND delete_at IS NULL "
-			+ "LIMIT 1",
+			+ "LIMIT 1 ",
 			nativeQuery = true)
 	Optional<Integer> existsByBarcode(@Param("barcode") String barcode);
 	

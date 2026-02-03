@@ -45,6 +45,14 @@ public class EntityFetcher {
 	}
 	
 	/**
+	 * 使用 供應商統編 找尋 已經被軟刪除的 供應商(找不到 回傳空)
+	 * */
+	public Supplier getSupplierByTaxIdIsDelete(String taxId) {
+		return supplierRepository.findByTaxIdIsDelete(taxId)
+				.orElse(null);
+	}
+	
+	/**
 	 * 使用 商品ID 找尋商品
 	 * */
 	public Product getProductById(Long productId) {
@@ -61,7 +69,7 @@ public class EntityFetcher {
 	}
 	
 	/**
-	 * 使用 商品條碼 找尋 已經配軟刪除的 商品(找不到 回傳空)
+	 * 使用 商品條碼 找尋 已經被軟刪除的 商品(找不到 回傳空)
 	 * */
 	public Product getProductByBarcodeIsDelete(String barcode) {
 		return productRepository.findByBarcodeIsDelete(barcode)

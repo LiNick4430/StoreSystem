@@ -1,5 +1,7 @@
 package com.storesystem.backend.service.impl;
 
+import java.time.LocalDateTime;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.storesystem.backend.exception.SupplierExistsException;
+import com.storesystem.backend.exception.SupplierHasProductException;
 import com.storesystem.backend.exception.SupplierNotFoundException;
 import com.storesystem.backend.model.dto.PageDTO;
 import com.storesystem.backend.model.dto.supplier.SupplierCreateDTO;
@@ -18,6 +21,7 @@ import com.storesystem.backend.model.dto.supplier.SupplierSearchAllDTO;
 import com.storesystem.backend.model.dto.supplier.SupplierSearchDTO;
 import com.storesystem.backend.model.dto.supplier.SupplierUpdateDTO;
 import com.storesystem.backend.model.entity.Supplier;
+import com.storesystem.backend.repository.ProductSupplierRepository;
 import com.storesystem.backend.repository.SupplierRepository;
 import com.storesystem.backend.repository.spec.SupplierSpec;
 import com.storesystem.backend.service.SupplierService;
@@ -35,6 +39,9 @@ public class SupplierServiceImpl implements SupplierService{
 	
 	@Autowired
 	private SupplierRepository supplierRepository;
+	
+	@Autowired
+	private ProductSupplierRepository productSupplierRepository;
 
 	@Override
 	public PageDTO<SupplierDTO> searchAllSupplier(SupplierSearchAllDTO dto) {
@@ -77,21 +84,32 @@ public class SupplierServiceImpl implements SupplierService{
 	public SupplierDTO createSupplier(SupplierCreateDTO dto) {
 		// 1. 前處理
 		String taxId = dto.getTaxId();
-		if (supplierRepository.existsByTaxIdIncludingDeleted(taxId) > 0) {
-			throw new SupplierExistsException("供應商統編已經被使用");
+		supplierRepository.existsByTaxId(taxId)
+			.ifPresent(found -> {
+				throw new SupplierExistsException("供應商統編已經被使用");
+			});
+		
+		// 2. 尋找 是否已經存在 同條碼的供應商(被軟刪除)
+		Supplier supplier = entityFetcher.getSupplierByTaxIdIsDelete(taxId);
+		
+		if (supplier != null) {
+			// 2-1. 資源回收的狀態 把 資料 改成 預設值
+			supplier.setDeleteAt(null);
+		} else {
+			// 2-2. 建立新的場合 先放入 統編
+			supplier = new Supplier();
+			supplier.setTaxId(taxId);
 		}
 		
-		// 2. 建立供應商
-		Supplier supplier = new Supplier();
+		// 3. 補上 剩餘資料
 		supplier.setSupplierName(dto.getName());
-		supplier.setTaxId(taxId);
 		supplier.setAddress(dto.getAddress());
 		supplier.setPhone(dto.getPhone());
 		
-		// 3. 儲存供應商
+		// 4. 儲存供應商
 		supplier = supplierRepository.save(supplier);
 		
-		// 4. 轉成 DTO
+		// 5. 轉成 DTO
 		return modelMapper.map(supplier, SupplierDTO.class);
 	}
 
@@ -114,10 +132,18 @@ public class SupplierServiceImpl implements SupplierService{
 
 	@Override
 	public void deleteSupplier(SupplierDeleteDTO dto) {
-		// TODO Auto-generated method stub
-
+		// 1. 尋找供應商
+		Supplier supplier = entityFetcher.getSupplierById(dto.getId());
+		
+		// 2. 檢查條件
+		productSupplierRepository.existsSupplierHasProduct(dto.getId())
+			.ifPresent(found -> {
+				throw new SupplierHasProductException("該工應商還有供應商品 無法刪除");
+			});
+		
+		// 3. 執行刪除 並且回存
+		supplier.setDeleteAt(LocalDateTime.now());
+		supplierRepository.save(supplier);
 	}
-
-	
 
 }

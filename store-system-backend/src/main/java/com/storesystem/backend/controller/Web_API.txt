@@ -11,7 +11,7 @@ POST 	findProductByBarcode 				->	"/find/barcode"
 POST 	createProdcut 						->	"/create"
 POST 	updateProduct 						->	"/update"
 POST 	setProductSaleStatus 				->	"/set/sale/status"
-DELETE 	deleteProduct 						->	"/delete"
+POST 	deleteProduct 						->	"/delete"
 
 Outside
 
@@ -25,7 +25,7 @@ POST	findById							-> "/find/id"
 POST	findByTaxId							-> "/find/tax/id"
 POST	createSupplier						-> "/create"
 POST	updateSupplier						-> "/update"
-DELETE	deleteSupplier						-> "/delete"
+POST	deleteSupplier						-> "/delete"
 
 ================================================================================
 PSController
@@ -39,6 +39,6 @@ POST	findAllPSByProductName				-> "/find/all/product/name/page"
 POST	findAllPSByProductBarcode			-> "/find/all/product/barcode/page"
 POST	linkPS								-> "/link"
 POST	undatePSCost						-> "/update"
-DELETE	unLink								-> "/unlink"
+POST	unLink								-> "/unlink"
 
 
