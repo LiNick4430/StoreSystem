@@ -116,7 +116,7 @@ export const deleteProduct = async (id) => {
   // 1. 建立基本設定檔
   const url = '/delete';
   const config = {
-    method: 'DELETE',
+    method: 'POST',
     body: JSON.stringify({ id })
   };
 
