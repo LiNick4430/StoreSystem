@@ -11,7 +11,7 @@ const SERVICE_BASE_URL = "/ps";
  * @param {number} size 大小
  * @returns {Promise<Object>} 該頁的資料
 */
-export const searchAllProduct = async (type, keyword, page, size) => {
+export const searchAllPS = async (type, keyword, page, size) => {
   // 1. 建立基本設定檔
   const api = searchAllMap[type];
   if (!api) {

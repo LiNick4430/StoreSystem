@@ -1,13 +1,12 @@
 /* 隱藏 Chrome, Safari, Edge 的數字箭頭 */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  appearance: textfield;
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
   margin: 0;
 }
 
 /* 隱藏 Firefox 的數字箭頭 */
 input[type=number] {
-  -moz-appearance: textfield;
-  appearance: textfield;
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
 }

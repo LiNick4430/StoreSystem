@@ -3,6 +3,8 @@ import './ProductPage.css'
 
 import { searchAllProduct } from '../services/productService'
 
+import ProductDetailPanel from '../components/ProductDetailPanel';
+
 function ProductPage() {
   // 資料狀態
   const [products, setProducts] = useState([]);
@@ -13,6 +15,8 @@ function ProductPage() {
   const [size, setSize] = useState(10);
   const [searchType, setSearchType] = useState("all");
   const [searchKeyWord, setSearchKeyWord] = useState("");
+
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   // 定義 抓取資料函式
   const fetchData = async () => {
@@ -29,6 +33,21 @@ function ProductPage() {
     }
   }
 
+  // 點擊事件 -> 個別商品資料 傳入 右側的 商品明細
+  const handleSelectRow = (product) => {
+    setSelectedProduct(product);
+  };
+
+  // 更新事件 -> 右側商品明細 更新後 直接讓 左側重新搜尋 
+  const onRefresh = async () => {
+    await fetchData();
+  }
+
+  // 關閉事件 -> 用於關閉 右側的 商品明細
+  const handleCloseDetail = () => {
+    setSelectedProduct(null);
+  }
+
   // 當 頁碼/大小 改變 重新型搜尋方法
   useEffect(() => {
     fetchData();
@@ -36,103 +55,124 @@ function ProductPage() {
 
   return (
     <>
-      <div className='container'>
-        <h1>商品搜尋</h1>
+      <div className='product-page-container'>
 
-        {/* 搜尋欄位 */}
-        <div className='search-bar'>
-          <select
-            className='search-type'
-            value={searchType}
-            onChange={(e) => {
-              setSearchType(e.target.value);
-              if (searchType === 'all') {
-                setSearchKeyWord("");
-              }
-            }}
-          >
-            <option value="all">全部</option>
-            <option value="name">商品名稱</option>
-            <option value="supplier">供應商ID</option>
-          </select>
-          <input
-            /* 當搜尋方式為 'all' 時，禁用輸入框 */
-            disabled={searchType === 'all'}
-
-            type={searchType === 'supplier' ? 'number' : 'text'}
-            placeholder={searchType === 'all'
-              ? '搜尋全部, 不需要關鍵字'
-              : searchType === 'supplier'
-                ? '請輸入供應商ID...' :
-                '請輸入關鍵字...'}
-            value={searchType === 'all' ? '' : searchKeyWord} // 搜尋全部時清空顯示文字
-            onChange={(e) => setSearchKeyWord(e.target.value)}
-            className={searchType === 'all' ? 'input-disabled' : ''}
-          />
-          <button onClick={() => {
-            setPage(1);
-            fetchData();
-          }}>搜尋</button>
-        </div>
-
-        {/* 資料展示區 */}
-        {products.length === 0 ? (
-          /* 沒資料時顯示的區塊 */
-          <div className="no-data-container">
-            <p>🔍 找不到相關商品，請嘗試其他關鍵字。</p>
-          </div>
-        ) : (
-          <table className='product-table'>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>名稱</th>
-                <th>條碼</th>
-                <th>規格</th>
-                <th>售價</th>
-                <th>庫存量</th>
-                <th>狀態</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map(p => (
-                <tr key={p.id}>
-                  <td>{p.id}</td>
-                  <td>{p.name}</td>
-                  <td>{p.barcode}</td>
-                  <td>{p.spec}</td>
-                  <td>{p.price}</td>
-                  <td>{p.stock}</td>
-                  <td>{p.isForSale ? '銷售中' : '不販售'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-
-        {/* 分頁控制區 */}
-        <div className='pagination-container'>
-          {/* 左邊：一頁大小size  */}
-          <div className='size-selector'>
-            <select value={size} onChange={(e) => {
-              setSize(Number(e.target.value));
-              setPage(1);
-            }}>
-              <option value="5">5 筆/頁</option>
-              <option value="10">10 筆/頁</option>
-              <option value="20">20 筆/頁</option>
+        {/* 左側欄位 */}
+        <div className='master-section'>
+          <h1>商品搜尋</h1>
+          {/* 搜尋欄位 */}
+          <div className='search-bar'>
+            <select
+              className='search-type'
+              value={searchType}
+              onChange={(e) => {
+                setSearchType(e.target.value);
+                if (searchType === 'all') {
+                  setSearchKeyWord("");
+                }
+              }}
+            >
+              <option value="all">全部</option>
+              <option value="name">商品名稱</option>
+              <option value="supplier">供應商ID</option>
             </select>
+            <input
+              /* 當搜尋方式為 'all' 時，禁用輸入框 */
+              disabled={searchType === 'all'}
+
+              type={searchType === 'supplier' ? 'number' : 'text'}
+              placeholder={searchType === 'all'
+                ? '搜尋全部, 不需要關鍵字'
+                : searchType === 'supplier'
+                  ? '請輸入供應商ID...' :
+                  '請輸入關鍵字...'}
+              value={searchType === 'all' ? '' : searchKeyWord} // 搜尋全部時清空顯示文字
+              onChange={(e) => setSearchKeyWord(e.target.value)}
+              className={searchType === 'all' ? 'input-disabled' : ''}
+            />
+            <button onClick={() => {
+              setPage(1);
+              fetchData();
+            }}>搜尋</button>
           </div>
 
-          {/* 右邊：目前頁碼/最大頁碼 */}
-          <div className='pagination-controls'>
-            <button disabled={page <= 1} onClick={() => setPage(page - 1)}>上一頁</button>
-            <span className='page-info'>
-              目前頁碼: <strong>{page}</strong> / 總頁數: <strong>{totalPages}</strong>
-            </span>
-            <button disabled={page >= totalPages} onClick={() => setPage(page + 1)}>下一頁</button>
+          {/* 資料展示區 */}
+          {products.length === 0 ? (
+            /* 沒資料時顯示的區塊 */
+            <div className="no-data-container">
+              <p>🔍 找不到相關商品，請嘗試其他關鍵字。</p>
+            </div>
+          ) : (
+            <table className='product-table'>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>名稱</th>
+                  <th>條碼</th>
+                  <th>規格</th>
+                  <th>售價</th>
+                  <th>庫存量</th>
+                  <th>狀態</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map(p => (
+                  <tr
+                    key={p.id}
+                    onClick={() => handleSelectRow(p)}  // 綁定點擊事件
+                    className={selectedProduct?.id === p.id ? 'active-row' : ''} // 家入選中的樣式
+                    style={{ cursor: 'pointer' }}  // 提示 使用者可以點擊
+                  >
+                    <td>{p.id}</td>
+                    <td>{p.name}</td>
+                    <td>{p.barcode}</td>
+                    <td>{p.spec}</td>
+                    <td>{p.price}</td>
+                    <td>{p.stock}</td>
+                    <td>{p.isForSale ? '銷售中' : '不販售'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          {/* 分頁控制區 */}
+          <div className='pagination-container'>
+            {/* 左邊：一頁大小size  */}
+            <div className='size-selector'>
+              <select value={size} onChange={(e) => {
+                setSize(Number(e.target.value));
+                setPage(1);
+              }}>
+                <option value="5">5 筆/頁</option>
+                <option value="10">10 筆/頁</option>
+                <option value="20">20 筆/頁</option>
+              </select>
+            </div>
+
+            {/* 右邊：目前頁碼/最大頁碼 */}
+            <div className='pagination-controls'>
+              <button disabled={page <= 1} onClick={() => setPage(page - 1)}>上一頁</button>
+              <span className='page-info'>
+                目前頁碼: <strong>{page}</strong> / 總頁數: <strong>{totalPages}</strong>
+              </span>
+              <button disabled={page >= totalPages} onClick={() => setPage(page + 1)}>下一頁</button>
+            </div>
           </div>
         </div>
+
+        {/* 右側：商品明細面板 */}
+        <div className='detail-section'>
+          {selectedProduct ? (
+            <ProductDetailPanel
+              product={selectedProduct}
+              onRefresh={onRefresh}
+              onClose={handleCloseDetail} />
+          ) : (
+            <div className="no-selection">請點擊商品以查看詳情</div>
+          )}
+        </div>
+
       </div>
     </>
   )

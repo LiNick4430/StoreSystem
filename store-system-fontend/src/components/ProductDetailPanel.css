@@ -1,0 +1,237 @@
+/* 1. 容器與標題 (Layout & Headings) */
+.detail-panel-content {
+  padding: 5px;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.detail-panel-content h2 {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin: 0;
+}
+
+.detail-panel-content h3 {
+  margin-top: 25px;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  color: #444;
+}
+
+/* 2. 表單欄位 (Form Fields) */
+.detail-item {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.detail-item label {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: bold;
+}
+
+/* 唯讀狀態：讓使用者一眼看出不能改 */
+.input-readonly {
+  background-color: #f1f3f5;
+  color: #495057;
+  border: 1px solid #dee2e6;
+  cursor: default;
+}
+
+/* 3. 表格樣式 (Table Styles) */
+.quote-table {
+  width: 100%;
+  font-size: 0.9rem;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+  table-layout: fixed;
+  /* 重要：固定佈局 */
+}
+
+/* 根據表頭欄位重要性分配寬度 */
+/* 重新分配百分比：讓第一欄與第四欄寬一點 */
+.quote-table th:nth-child(1),
+.quote-table td:nth-child(1) {
+  width: 30%;
+}
+
+/* 供應商 */
+.quote-table th:nth-child(2),
+.quote-table td:nth-child(2) {
+  width: 20%;
+}
+
+/* 統編 */
+.quote-table th:nth-child(3),
+.quote-table td:nth-child(3) {
+  width: 20%;
+}
+
+/* 報價 */
+.quote-table th:nth-child(4),
+.quote-table td:nth-child(4) {
+  width: 30%;
+}
+
+/* 操作 */
+
+.quote-table thead tr {
+  background-color: #f8f9fa;
+}
+
+.quote-table th,
+.quote-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.quote-table td {
+  vertical-align: middle;
+}
+
+.quote-table td:last-child {
+  vertical-align: middle;
+}
+
+.quote-table th {
+  font-weight: 600;
+  color: #666;
+}
+
+/* 報價表格為空時的提示樣式 */
+.empty-quote-cell {
+  text-align: center;
+  color: #999;
+  padding: 30px 10px;
+  /* 增加一點高度感 */
+  font-style: italic;
+  font-size: 0.9rem;
+  background-color: #fafafa;
+  /* 給一點淡淡的底色區隔 */
+}
+
+/* 新增欄位 */
+.adding-row {
+  background-color: #fff9db !important;
+}
+
+.inline-input {
+  width: 100%;
+  /* 填滿該格 td */
+  max-width: 100%;
+  /* 不准超過 td */
+  box-sizing: border-box;
+  /* 包含 padding 計算 */
+  padding: 4px 6px;
+}
+
+.inline-select {
+  width: 100%;
+  padding: 4px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 0.9rem;
+}
+
+.text-muted {
+  color: #adb5bd;
+  font-size: 0.9rem;
+}
+
+/* 4. 按鈕類 (Buttons) */
+button {
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: white;
+}
+
+/* 主要更新按鈕 (綠色) */
+.update-btn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #28a745;
+}
+
+.update-btn:hover {
+  background-color: #218838;
+}
+
+/* 次要/新增按鈕 (灰色) */
+.add-quote-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 8px;
+  background-color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.add-quote-btn:hover {
+  background-color: #5a6268;
+}
+
+/* 危險/刪除小按鈕 (紅色) */
+.delete-btn-sm {
+  padding: 4px 8px;
+  background-color: #dc3545;
+  font-size: 0.75rem;
+}
+
+.delete-btn-sm:hover {
+  background-color: #bd2130;
+}
+
+/* 小 X 關閉按鈕樣式 */
+.close-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 28px;
+  /* 讓 X 大一點 */
+  font-weight: bold;
+  line-height: 1;
+  padding: 0 5px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #dc3545;
+  /* 滑過變紅色 */
+}
+
+.action-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+}
+
+.save-btn-sm,
+.cancel-btn-sm {
+  white-space: nowrap;
+  padding: 4px 8px;
+}
+
+/* 儲存按鈕維持綠色 */
+.save-btn-sm {
+  background-color: #28a745;
+}
+
+/* 取消按鈕維持灰色 */
+.cancel-btn-sm {
+  background-color: #6c757d;
+}

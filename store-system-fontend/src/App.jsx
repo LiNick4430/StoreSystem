@@ -16,7 +16,7 @@ function App() {
       <Routes>
         {/* 登入頁面 如果已登入 則轉到 儀表板頁面 */}
         <Route path='/login' element={
-          isLoggedIn ? <Navigate to="/dashboard/product" /> : <LoginPage onLogin={() => setIsLoggedIn(true)} />
+          isLoggedIn ? <Navigate to="/dashboard/home" /> : <LoginPage onLogin={() => setIsLoggedIn(true)} />
         } />
 
         {/* 儀表板頁面 如果未登入 則轉到 登入頁面 */}
@@ -24,6 +24,7 @@ function App() {
           isLoggedIn ? <DashboardLayout onLogout={() => setIsLoggedIn(false)} /> : <Navigate to='/login' />
         }>
           {/* 巢狀路由 */}
+          <Route path="home" element={<div>儀錶板主頁面</div>} />
           <Route path="product" element={<ProductPage />} />
           <Route path="supplier" element={<div>供應商管理頁面</div>} />
           <Route path="order" element={<div>進貨單管理頁面</div>} />
