@@ -71,9 +71,9 @@ public class ProductSupplierServiceImpl implements ProductSupplierService{
 		Page<ProductSupplier> page = productSupplierRepository.findAll(spec, pageable);
 		
 		// 3. 檢查是否有資料
-		if (page.isEmpty()) {
+		/*if (page.isEmpty()) {
 			throw new ProductSupplierNotFoundException("無滿足此條件的結果");
-		}
+		}*/
 		
 		// 4. 轉成 DTO
 		return PageUtil.toPageDTO(page, ps -> modelMapper.map(ps, ProductSupplierDTO.class));
