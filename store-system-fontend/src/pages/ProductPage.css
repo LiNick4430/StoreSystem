@@ -119,12 +119,13 @@ button:disabled {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
+  table-layout: fixed;
 }
 
 .product-table th,
 .product-table td {
   border-bottom: 1px solid #eee;
-  padding: 14px 10px;
+  padding: 12px 8px;
   text-align: left;
 }
 
@@ -140,11 +141,27 @@ button:disabled {
   background-color: #fcfcfc;
 }
 
+.product-table td:nth-child(1),
+.product-table th:nth-child(1) {
+  width: 60px;
+  /* 給予固定寬度，不隨 ID 長度變動 */
+  min-width: 60px;
+  text-align: center;
+  /* ID 通常置中看起來比較舒服 */
+}
+
+.product-table td:nth-child(3) {
+  width: 150px;
+  font-family: monospace;
+  /* 用等寬字體看條碼更整齊 */
+}
+
 /* 被選中的行背景變色 */
 .product-table tr.active-row {
   background-color: #e3f2fd;
-  border-left: 4px solid #007bff;
-  /* 加一個左邊條強調 */
+  border-left: none;
+  /* 改用內陰影模擬左邊條：向右偏移 4px，不模糊，顏色藍 */
+  box-shadow: inset 4px 0 0 0 #007bff;
 }
 
 /* 滑鼠滑過效果 */

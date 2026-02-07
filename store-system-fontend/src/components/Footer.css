@@ -1,0 +1,27 @@
+.admin-footer {
+  box-sizing: border-box;
+  /* 加入這一行，解決寬度溢出問題 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  /* 這裡可以微調左右邊距 */
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  font-size: 12px;
+  color: #6c757d;
+  height: 40px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  /* 確保從最左邊開始 */
+  right: 0;
+  /* 取代 width: 100%，能更安全地適應寬度 */
+}
+
+.status-indicator::before {
+  content: "●";
+  color: #28a745;
+  /* 綠色燈號 */
+  margin-right: 5px;
+}

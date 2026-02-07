@@ -73,13 +73,13 @@
 /* 統編 */
 .quote-table th:nth-child(3),
 .quote-table td:nth-child(3) {
-  width: 20%;
+  width: 15%;
 }
 
 /* 報價 */
 .quote-table th:nth-child(4),
 .quote-table td:nth-child(4) {
-  width: 30%;
+  width: 35%;
 }
 
 /* 操作 */
@@ -109,7 +109,8 @@
 }
 
 /* 報價表格為空時的提示樣式 */
-.empty-quote-cell {
+.empty-quote-cell,
+.new-product-notice {
   text-align: center;
   color: #999;
   padding: 30px 10px;
@@ -118,6 +119,9 @@
   font-size: 0.9rem;
   background-color: #fafafa;
   /* 給一點淡淡的底色區隔 */
+
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* 新增欄位 */
@@ -158,16 +162,49 @@ button {
   color: white;
 }
 
+.detail-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  align-items: stretch;
+}
+
 /* 主要更新按鈕 (綠色) */
 .update-btn {
-  width: 100%;
-  margin-top: 10px;
+  flex: 3;
   padding: 10px;
   background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
 }
 
 .update-btn:hover {
   background-color: #218838;
+}
+
+.delete-btn-main {
+  flex: 1;
+  background-color: #ff4d4f;
+  /* 警示紅 */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  flex: 1;
+}
+
+.delete-btn-main:hover {
+  background-color: #ff7875;
+}
+
+.delete-btn-main:disabled {
+  background-color: #ffa39e;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 /* 次要/新增按鈕 (灰色) */
@@ -181,17 +218,6 @@ button {
 
 .add-quote-btn:hover {
   background-color: #5a6268;
-}
-
-/* 危險/刪除小按鈕 (紅色) */
-.delete-btn-sm {
-  padding: 4px 8px;
-  background-color: #dc3545;
-  font-size: 0.75rem;
-}
-
-.delete-btn-sm:hover {
-  background-color: #bd2130;
 }
 
 /* 小 X 關閉按鈕樣式 */
@@ -213,6 +239,7 @@ button {
   /* 滑過變紅色 */
 }
 
+/* 操作欄位 */
 .action-btns {
   display: flex;
   align-items: center;
@@ -221,17 +248,46 @@ button {
 }
 
 .save-btn-sm,
-.cancel-btn-sm {
+.cancel-btn-sm,
+.edit-btn-sm,
+.delete-btn-sm {
   white-space: nowrap;
-  padding: 4px 8px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
 }
 
-/* 儲存按鈕維持綠色 */
+/* 藍色：更新報價 */
+.edit-btn-sm {
+  background-color: #007bff;
+}
+
+.edit-btn-sm:hover {
+  background-color: #0069d9;
+}
+
+/* 紅色：取消關聯 */
+.delete-btn-sm {
+  background-color: #dc3545;
+}
+
+.delete-btn-sm:hover {
+  background-color: #bd2130;
+}
+
+/* 綠色：儲存 (新增或更新) */
 .save-btn-sm {
   background-color: #28a745;
 }
 
-/* 取消按鈕維持灰色 */
+.save-btn-sm:hover {
+  background-color: #218838;
+}
+
+/* 灰色：取消 (新增或更新) */
 .cancel-btn-sm {
   background-color: #6c757d;
+}
+
+.cancel-btn-sm:hover {
+  background-color: #5a6268;
 }

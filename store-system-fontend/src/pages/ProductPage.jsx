@@ -9,6 +9,7 @@ function ProductPage() {
   // 資料狀態
   const [products, setProducts] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
+  const newProduct = { id: null, name: '', spec: '', price: 0, barcode: '' };
 
   // 分頁與搜尋方式
   const [page, setPage] = useState(1);
@@ -94,6 +95,10 @@ function ProductPage() {
               setPage(1);
               fetchData();
             }}>搜尋</button>
+            <button onClick={() => {
+              setSelectedProduct(newProduct)
+            }}> + 新增商品
+            </button>
           </div>
 
           {/* 資料展示區 */}
@@ -138,7 +143,7 @@ function ProductPage() {
 
           {/* 分頁控制區 */}
           <div className='pagination-container'>
-            {/* 左邊：一頁大小size  */}
+            {/* 一頁大小size  */}
             <div className='size-selector'>
               <select value={size} onChange={(e) => {
                 setSize(Number(e.target.value));
@@ -150,7 +155,7 @@ function ProductPage() {
               </select>
             </div>
 
-            {/* 右邊：目前頁碼/最大頁碼 */}
+            {/* 目前頁碼/最大頁碼 */}
             <div className='pagination-controls'>
               <button disabled={page <= 1} onClick={() => setPage(page - 1)}>上一頁</button>
               <span className='page-info'>
