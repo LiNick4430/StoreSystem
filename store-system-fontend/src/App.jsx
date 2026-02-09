@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage'
 import DashboardLayout from './pages/DashboardLayout'
 
 import ProductPage from './pages/ProductPage';
+import SupplierPage from './pages/SupplierPage';
 
 import './App.css'
 
@@ -26,7 +27,7 @@ function App() {
           {/* 巢狀路由 */}
           <Route path="home" element={<div>儀錶板主頁面</div>} />
           <Route path="product" element={<ProductPage />} />
-          <Route path="supplier" element={<div>供應商管理頁面</div>} />
+          <Route path="supplier" element={<SupplierPage />} />
           <Route path="order" element={<div>進貨單管理頁面</div>} />
         </Route>
 
