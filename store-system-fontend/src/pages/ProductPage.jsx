@@ -1,37 +1,42 @@
-import { useState, useEffect } from 'react'
+// 匯入 CSS
 import './ProductPage.css'
 
+// 匯入 搜尋全部 的 方法
 import { searchAllProduct } from '../services/productService'
 
+// 匯入 右側 商品明細
 import ProductDetailPanel from '../components/ProductDetailPanel';
 
+// 匯入 搜尋欄位
+import SearchBar from '../components/SearchBar';
+
+// 匯入 使用分頁搜尋 + 分頁控制區
+import { usePaginationSearch } from '../hooks/usePaginationSearch';
+import Pagination from '../components/Pagination';
+
 function ProductPage() {
-  // 資料狀態
-  const [products, setProducts] = useState([]);
-  const [totalPages, setTotalPages] = useState(0);
+  // 設定 使用分頁搜尋 的 對應變數(items 修改成 對應的變數名)
+  const {
+    items: products, totalPages, page, setPage, size, setSize,
+    searchType, setSearchType, searchKeyWord, setSearchKeyWord,
+    selectedItem: selectedProduct, setSelectedItem: setSelectedProduct, fetchData
+  } = usePaginationSearch(searchAllProduct);
+
+  // 新商品 的 預設條件
   const newProduct = { id: null, name: '', spec: '', price: 0, barcode: '' };
 
-  // 分頁與搜尋方式
-  const [page, setPage] = useState(1);
-  const [size, setSize] = useState(10);
-  const [searchType, setSearchType] = useState("all");
-  const [searchKeyWord, setSearchKeyWord] = useState("");
+  // 設定 SearchBar 中 typeOptions 的細節
+  const typeOptions = [
+    { label: '全部', value: "all" },
+    { label: '商品名稱', value: "name" },
+    { label: '供應商ID', value: "supplier" }
+  ]
 
-  const [selectedProduct, setSelectedProduct] = useState(null);
-
-  // 定義 抓取資料函式
-  const fetchData = async () => {
-    try {
-      const response = await searchAllProduct(searchType, searchKeyWord, page, size);
-
-      if (response && response.data) {
-        setProducts(response.data.content || []);
-        setTotalPages(response.data.totalPages || 0);
-      }
-    } catch (error) {
-      console.error(error);
-      alert("抓取失敗：" + error.message);
-    }
+  // 設定 SearchBar 中 keywordConfigs 的 對應關係
+  const keywordConfigs = {
+    all: { type: 'text', placeholder: '搜尋全部, 不需要關鍵字' },
+    name: { type: 'text', placeholder: '請輸入關鍵字...' },
+    supplier: { type: 'number', placeholder: '請輸入供應商ID...' }
   }
 
   // 點擊事件 -> 個別商品資料 傳入 右側的 商品明細
@@ -49,11 +54,6 @@ function ProductPage() {
     setSelectedProduct(null);
   }
 
-  // 當 頁碼/大小 改變 重新型搜尋方法
-  useEffect(() => {
-    fetchData();
-  }, [page, size])
-
   return (
     <>
       <div className='product-page-container'>
@@ -62,44 +62,22 @@ function ProductPage() {
         <div className='master-section'>
           <h1>商品搜尋</h1>
           {/* 搜尋欄位 */}
-          <div className='search-bar'>
-            <select
-              className='search-type'
-              value={searchType}
-              onChange={(e) => {
-                setSearchType(e.target.value);
-                if (searchType === 'all') {
-                  setSearchKeyWord("");
-                }
-              }}
-            >
-              <option value="all">全部</option>
-              <option value="name">商品名稱</option>
-              <option value="supplier">供應商ID</option>
-            </select>
-            <input
-              /* 當搜尋方式為 'all' 時，禁用輸入框 */
-              disabled={searchType === 'all'}
-
-              type={searchType === 'supplier' ? 'number' : 'text'}
-              placeholder={searchType === 'all'
-                ? '搜尋全部, 不需要關鍵字'
-                : searchType === 'supplier'
-                  ? '請輸入供應商ID...' :
-                  '請輸入關鍵字...'}
-              value={searchType === 'all' ? '' : searchKeyWord} // 搜尋全部時清空顯示文字
-              onChange={(e) => setSearchKeyWord(e.target.value)}
-              className={searchType === 'all' ? 'input-disabled' : ''}
-            />
-            <button onClick={() => {
+          <SearchBar
+            searchType={searchType}
+            setSearchType={setSearchType}
+            searchKeyWord={searchKeyWord}
+            setSearchKeyWord={setSearchKeyWord}
+            onSearch={() => {
               setPage(1);
               fetchData();
-            }}>搜尋</button>
-            <button onClick={() => {
+            }}
+            onAdd={() => {
               setSelectedProduct(newProduct)
-            }}> + 新增商品
-            </button>
-          </div>
+            }}
+            addButtonText=' + 新增商品'
+            typeOptions={typeOptions}
+            keywordConfigs={keywordConfigs[searchType]}
+          />
 
           {/* 資料展示區 */}
           {products.length === 0 ? (
@@ -142,28 +120,13 @@ function ProductPage() {
           )}
 
           {/* 分頁控制區 */}
-          <div className='pagination-container'>
-            {/* 一頁大小size  */}
-            <div className='size-selector'>
-              <select value={size} onChange={(e) => {
-                setSize(Number(e.target.value));
-                setPage(1);
-              }}>
-                <option value="5">5 筆/頁</option>
-                <option value="10">10 筆/頁</option>
-                <option value="20">20 筆/頁</option>
-              </select>
-            </div>
-
-            {/* 目前頁碼/最大頁碼 */}
-            <div className='pagination-controls'>
-              <button disabled={page <= 1} onClick={() => setPage(page - 1)}>上一頁</button>
-              <span className='page-info'>
-                目前頁碼: <strong>{page}</strong> / 總頁數: <strong>{totalPages}</strong>
-              </span>
-              <button disabled={page >= totalPages} onClick={() => setPage(page + 1)}>下一頁</button>
-            </div>
-          </div>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            size={size}
+            setPage={setPage}
+            setSize={setSize}
+          />
         </div>
 
         {/* 右側：商品明細面板 */}

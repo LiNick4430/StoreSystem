@@ -1,0 +1,119 @@
+/* 基本容器設置 */
+.supplier-page-container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  align-items: flex-start;
+  /* 確保右側面板不會被強行拉長 */
+  font-family: 'Segoe UI', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 左側：搜尋與表格 */
+.master-section {
+  flex: 7;
+  /* 佔據 7 成寬度 */
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 右側：商品明細面板 */
+.detail-section {
+  flex: 3;
+  /* 佔據 3 成寬度 */
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  /* 讓它滾動時能固定在畫面頂部 */
+  top: 80px;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+/* --- 資料展示區 (草圖中央表格) --- */
+.no-data-container {
+  padding: 50px;
+  text-align: center;
+  background-color: #f8f9fa;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  color: #666;
+  margin: 20px 0;
+  font-size: 1.1rem;
+}
+
+.supplier-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  table-layout: fixed;
+}
+
+.supplier-table th,
+.supplier-table td {
+  border-bottom: 1px solid #eee;
+  padding: 12px 8px;
+  text-align: left;
+}
+
+.supplier-table th {
+  background-color: #f4f7f6;
+  color: #555;
+  font-weight: 600;
+  border-top: 2px solid #007bff;
+  /* 表頭加強線條 */
+}
+
+.supplier-table tr:hover {
+  background-color: #fcfcfc;
+}
+
+.supplier-table td:nth-child(1),
+.supplier-table th:nth-child(1) {
+  width: 60px;
+  /* 給予固定寬度，不隨 ID 長度變動 */
+  min-width: 60px;
+  text-align: center;
+  /* ID 通常置中看起來比較舒服 */
+}
+
+.supplier-table td:nth-child(2),
+.supplier-table th:nth-child(2) {
+  width: 250px;
+  /* 給予固定寬度，不隨 ID 長度變動 */
+  min-width: 250px;
+}
+
+.supplier-table td:nth-child(3),
+.supplier-table th:nth-child(3) {
+  width: 100px;
+  /* 給予固定寬度，不隨 ID 長度變動 */
+  min-width: 100px;
+}
+
+.supplier-table td:nth-child(4),
+.supplier-table th:nth-child(4) {
+  width: 200px;
+  /* 給予固定寬度，不隨 ID 長度變動 */
+  min-width: 200px;
+}
+
+/* 被選中的行背景變色 */
+.supplier-table tr.active-row {
+  background-color: #e3f2fd;
+  border-left: none;
+  /* 改用內陰影模擬左邊條：向右偏移 4px，不模糊，顏色藍 */
+  box-shadow: inset 4px 0 0 0 #007bff;
+}
+
+/* 滑鼠滑過效果 */
+.supplier-table tr:hover {
+  background-color: #f5f5f5;
+}
