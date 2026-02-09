@@ -49,6 +49,13 @@ public interface ProductSupplierRepository extends JpaRepository<ProductSupplier
 	Optional<ProductSupplier> findByProductAndSupplierIsDelete(@Param("productId") Long productId,
 																@Param("supplierId") Long supplierId);
 	
+	/** 自訂 使用 供應商 ID 計算 有多少 商品提供 */
+	@Query(value = "SELECT COUNT(*) FROM product_supplier "
+			+ "WHERE supplier_id = :supplierId "
+			+ "AND delete_at IS NULL ",
+			nativeQuery = true)
+	Long countProductsBySupplier(@Param("supplierId") Long supplierId);
+	
 	/** 自訂 使用 商品 看是否存在 關聯表 */
 	@Query(value = "SELECT 1 FROM product_supplier "
 			+ "WHERE product_id = :productId "

@@ -58,7 +58,13 @@ public class SupplierServiceImpl implements SupplierService{
 		Page<Supplier> page = supplierRepository.findAll(spec, pageable);
 		
 		// 3. 轉成 DTO
-		return PageUtil.toPageDTO(page, supplier -> modelMapper.map(supplier, SupplierDTO.class));
+		return PageUtil.toPageDTO(page, supplier -> {
+			SupplierDTO supplierDTO = modelMapper.map(supplier, SupplierDTO.class);
+			
+			// 大量顯示時 快速計算 供應商提供的 商品總數
+			supplierDTO.setProductQty(productSupplierRepository.countProductsBySupplier(supplier.getSupplierId()));		
+			return supplierDTO;
+		});
 	}
 
 	@Override
