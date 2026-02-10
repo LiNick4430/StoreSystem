@@ -9,19 +9,17 @@
 }
 
 /* 左側：搜尋與表格 */
-.master-section {
-  flex: 7;
-  /* 佔據 7 成寬度 */
+.supplier-page-container .master-section {
+  flex: 6;
   background: white;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* 右側：商品明細面板 */
-.detail-section {
-  flex: 3;
-  /* 佔據 3 成寬度 */
+/* 右側：供應商面板 */
+.supplier-page-container .detail-section {
+  flex: 4;
   background: white;
   padding: 20px;
   border-radius: 8px;
@@ -31,7 +29,7 @@
   top: 80px;
 }
 
-h1 {
+.supplier-page-container .master-section h1 {
   color: #333;
   margin-bottom: 24px;
   text-align: center;
@@ -78,7 +76,6 @@ h1 {
 .supplier-table td:nth-child(1),
 .supplier-table th:nth-child(1) {
   width: 60px;
-  /* 給予固定寬度，不隨 ID 長度變動 */
   min-width: 60px;
   text-align: center;
   /* ID 通常置中看起來比較舒服 */
@@ -87,22 +84,31 @@ h1 {
 .supplier-table td:nth-child(2),
 .supplier-table th:nth-child(2) {
   width: 250px;
-  /* 給予固定寬度，不隨 ID 長度變動 */
   min-width: 250px;
 }
 
 .supplier-table td:nth-child(3),
 .supplier-table th:nth-child(3) {
   width: 100px;
-  /* 給予固定寬度，不隨 ID 長度變動 */
   min-width: 100px;
 }
 
 .supplier-table td:nth-child(4),
 .supplier-table th:nth-child(4) {
-  width: 200px;
-  /* 給予固定寬度，不隨 ID 長度變動 */
-  min-width: 200px;
+  width: 250px;
+  min-width: 250px;
+}
+
+.supplier-table td:nth-child(5),
+.supplier-table th:nth-child(5) {
+  width: 100px;
+  min-width: 100px;
+}
+
+.supplier-table td:nth-child(6),
+.supplier-table th:nth-child(6) {
+  width: 80px;
+  min-width: 80px;
 }
 
 /* 被選中的行背景變色 */

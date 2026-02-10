@@ -9,9 +9,8 @@
 }
 
 /* 左側：搜尋與表格 */
-.master-section {
+.product-page-container .master-section {
   flex: 7;
-  /* 佔據 7 成寬度 */
   background: white;
   padding: 20px;
   border-radius: 8px;
@@ -19,9 +18,8 @@
 }
 
 /* 右側：商品明細面板 */
-.detail-section {
+.product-page-container .detail-section {
   flex: 3;
-  /* 佔據 3 成寬度 */
   background: white;
   padding: 20px;
   border-radius: 8px;
@@ -31,7 +29,7 @@
   top: 80px;
 }
 
-h1 {
+.product-page-container .master-section h1 {
   color: #333;
   margin-bottom: 24px;
   text-align: center;

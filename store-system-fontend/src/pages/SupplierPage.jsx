@@ -93,7 +93,7 @@ function SupplierPage() {
                   <th>統編</th>
                   <th>地址</th>
                   <th>電話</th>
-                  <th>供應數量</th>
+                  <th>商品量</th>
                 </tr>
               </thead>
               <tbody>
@@ -109,7 +109,7 @@ function SupplierPage() {
                     <td>{s.taxId}</td>
                     <td>{s.address}</td>
                     <td>{s.phone}</td>
-                    <td>{s.productQty ? s.productQty : 0} 項商品</td>
+                    <td>{s.productQty ? s.productQty : 0} 項</td>
                   </tr>
                 ))}
               </tbody>

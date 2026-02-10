@@ -139,9 +139,9 @@ function SupplierDetailPanel({ supplier, onRefresh, onClose }) {
   }
 
   // 取消商品 與供應商的 關聯
-  const handleUnLink = async (productId, productName) => {
+  const handleUnLink = async (productId, productName, barcode) => {
     // 安全確認 避免誤點
-    if (!window.confirm(`確定要取消供應 商品名(${productName}) 商品條碼(${productName}) 報價關係嗎?`)) return;
+    if (!window.confirm(`確定要取消供應 商品名(${productName}) 商品條碼(${barcode}) 報價關係嗎?`)) return;
 
     // 執行 API
     try {
@@ -295,7 +295,7 @@ function SupplierDetailPanel({ supplier, onRefresh, onClose }) {
 
                   return (
                     <tr key={`${q.supplierId}-${q.productId}`}>
-                      <td>{q.productName}</td>
+                      <td>{q.productName} {q.spec}</td>
                       <td>{q.barcode}</td>
 
                       {/* 2. 報價欄位切換：如果是正在編輯的那一列，顯示 input */}
@@ -388,7 +388,7 @@ function SupplierDetailPanel({ supplier, onRefresh, onClose }) {
                         // 3. 有資料才跑 map
                         return availableProducts.map(sup => (
                           <option key={sup.id} value={sup.id}>
-                            {sup.name}
+                            {sup.name} {sup.spec}
                           </option>
                         ));
                       })()}
