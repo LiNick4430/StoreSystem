@@ -17,7 +17,9 @@ function ProductDetailPanel({ product, onRefresh, onClose }) {
 
   // 用於 新增 新關聯 的狀態/設置
   const [isAdding, setIsAdding] = useState(false);
-  const [newQuote, setNewQuote] = useState({ supplierId: '', defaultCost: '' });
+  const defaultNewQuote = { supplierId: '', defaultCost: '' };
+  const [newQuote, setNewQuote] = useState(defaultNewQuote);
+
 
   // 更新報價 的 狀態
   const [editingSupplierId, setEditingSupplierId] = useState(null); // 紀錄哪一家在編輯
@@ -32,7 +34,7 @@ function ProductDetailPanel({ product, onRefresh, onClose }) {
 
     // 更新為預設值
     setIsAdding(false);
-    setNewQuote({ supplierId: '', defaultCost: '' });
+    setNewQuote(defaultNewQuote);
     setEditingSupplierId(null);
     setEditCost("");
 
@@ -169,7 +171,7 @@ function ProductDetailPanel({ product, onRefresh, onClose }) {
       if (response) {
         alert("新增關聯成功！");
         setIsAdding(false); // 關閉新增列
-        setNewQuote({ supplierId: '', defaultCost: '' }); // 清空輸入
+        setNewQuote(defaultNewQuote); // 清空輸入
         fetchQuotes(formData.id); // 重新整理下方報價列表
       }
 
