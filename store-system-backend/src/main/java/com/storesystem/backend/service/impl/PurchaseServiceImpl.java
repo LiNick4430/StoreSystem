@@ -18,6 +18,7 @@ import com.storesystem.backend.model.enums.PurchaseStatus;
 import com.storesystem.backend.repository.PurchaseDetailRepository;
 import com.storesystem.backend.repository.PurchaseOrderRepository;
 import com.storesystem.backend.service.PurchaseService;
+import com.storesystem.backend.util.NumberUtil;
 
 @Service
 @Transactional
@@ -28,6 +29,9 @@ public class PurchaseServiceImpl implements PurchaseService{
 	
 	@Autowired
 	private EntityFetcher entityFetcher;
+	
+	@Autowired
+	private NumberUtil numberUtil;
 	
 	@Autowired
 	private PurchaseOrderRepository purchaseOrderRepository;
@@ -54,12 +58,13 @@ public class PurchaseServiceImpl implements PurchaseService{
 	}
 
 	private PurchaseOrder createOrder(CreateNewOrderDTO dto) {
-		Supplier supplier = entityFetcher.getSupplierById(dto.getSupplierId());
 		
-		String number = dto.getDate() + "test";
+		Supplier supplier = entityFetcher.getSupplierById(dto.getSupplierId());		
+		String number = numberUtil.generatePurchaseOrderNumber();
 		
 		PurchaseOrder order = new PurchaseOrder();
 		order.setSupplier(supplier);
+		order.setPurchaseOrderNumber(number);
 		order.setPurchaseOrderDate(dto.getDate());
 		order.setStatus(PurchaseStatus.DRAFT);
 		order.setTotalAmount(new BigDecimal(0));

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.storesystem.backend.model.entity.Product;
 import com.storesystem.backend.model.entity.ProductSupplier;
 import com.storesystem.backend.model.entity.Supplier;
+import com.storesystem.backend.repository.DailyCountRepository;
 import com.storesystem.backend.repository.ProductRepository;
 import com.storesystem.backend.repository.ProductSupplierRepository;
 import com.storesystem.backend.repository.SupplierRepository;
@@ -28,9 +29,21 @@ public class DataInitializer implements CommandLineRunner{
 
 	@Autowired
 	private ProductSupplierRepository productSupplierRepository;
+	
+	@Autowired
+	private DailyCountRepository dailyCountRepository;
+	
+	@Autowired
+	private NumberUtil numberUtil;
 
 	@Override
 	public void run(String... args) throws Exception {
+		// 初始化 計數表單
+		if (dailyCountRepository.count() == 0) {
+			generateDefaultNumbers();
+		}
+		
+		// 初始化 商品/供應商/關聯表
 		if (productRepository.count() == 0 && 
 				supplierRepository.count() == 0 && 
 				productSupplierRepository.count() == 0) {
@@ -109,6 +122,11 @@ public class DataInitializer implements CommandLineRunner{
 		}
 	}
 
+	// 用於 初始化 全部 計數表 的方法
+	private void generateDefaultNumbers() {
+		numberUtil.generatePurchaseOrderNumber();
+	}
+	
 	private Product createProduct(String barcode,
 			String name,
 			String spec,
