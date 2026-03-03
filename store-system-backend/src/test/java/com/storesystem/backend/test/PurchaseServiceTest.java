@@ -99,7 +99,5 @@ public class PurchaseServiceTest {
         assertNotNull(orderDTO.getNumber());
         assertTrue(new BigDecimal("3000").compareTo(orderDTO.getTotal()) == 0);
         assertEquals(2, orderDTO.getDetails().size());
-		
 	}
-	
 }
