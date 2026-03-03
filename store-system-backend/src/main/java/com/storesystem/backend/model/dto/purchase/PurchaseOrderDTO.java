@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,6 +27,10 @@ public class PurchaseOrderDTO {
 	
 	private String status;	// 目前進貨狀態
 	
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private Set<PurchaseDetailDTO> details;	// 對應的 明細
+	
+	@JsonInclude(JsonInclude.Include.NON_NULL)	// 只有大量搜尋時 會填充這個數值才會顯示
+	private Integer detailQty;	// 明細總和
 	
 }

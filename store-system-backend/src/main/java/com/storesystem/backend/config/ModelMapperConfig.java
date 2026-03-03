@@ -70,6 +70,7 @@ public class ModelMapperConfig {
 			mapper.map(PurchaseOrder::getTotalAmount, PurchaseOrderDTO::setTotal);
 			
 			mapper.skip(PurchaseOrderDTO::setDetails);	// 使用時 後續手動放入 內文
+			mapper.skip(PurchaseOrderDTO::setDetailQty);
 		});
 
 		modelMapper.typeMap(PurchaseDetail.class, PurchaseDetailDTO.class).addMappings(mapper -> {

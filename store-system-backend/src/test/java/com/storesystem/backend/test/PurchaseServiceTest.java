@@ -16,9 +16,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.storesystem.backend.model.dto.PageDTO;
 import com.storesystem.backend.model.dto.purchase.CreateNewDetialDTO;
 import com.storesystem.backend.model.dto.purchase.CreateNewOrderDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseOrderDTO;
+import com.storesystem.backend.model.dto.purchase.PurchaseOrderSearchAllDTO;
 import com.storesystem.backend.model.entity.PurchaseOrder;
 import com.storesystem.backend.repository.PurchaseOrderRepository;
 import com.storesystem.backend.service.PurchaseService;
@@ -31,6 +33,34 @@ public class PurchaseServiceTest {
 	
 	@Autowired
 	private PurchaseOrderRepository purchaseOrderRepository;
+	
+	@Test
+	void searchAll() {
+		// 1. 建立 搜尋DTO
+		PurchaseOrderSearchAllDTO searchAllDTO = new PurchaseOrderSearchAllDTO();
+		searchAllDTO.setSupplierId(1L);
+		searchAllDTO.setPage(1);
+		searchAllDTO.setSize(10);
+		
+		// 2. 執行方法
+		PageDTO<PurchaseOrderDTO> page = purchaseService.searchAllPurchaseOrder(searchAllDTO);
+		
+		// 3. 測試顯示
+		try {
+        	// 單行寫法
+        	System.out.println("回傳 DTO JSON:");
+        	System.out.println(
+        		    new ObjectMapper()
+        		        .findAndRegisterModules()
+        		        .writerWithDefaultPrettyPrinter()
+        		        .writeValueAsString(page)
+        		);
+        	
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		
+	}
 	
 	@Test
 	void createNewOrder() {
@@ -68,20 +98,7 @@ public class PurchaseServiceTest {
         assertTrue(new BigDecimal("3000").compareTo(latestOrder.getTotalAmount()) == 0);
         
         // 4. 驗證 回傳DTO
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.findAndRegisterModules();
-        mapper.writerWithDefaultPrettyPrinter();
-        
         try {
-        	/* 多行寫法
-			String json = mapper
-					.writerWithDefaultPrettyPrinter()
-					.writeValueAsString(orderDTO);
-			
-			System.out.println("回傳 DTO JSON:");
-		    System.out.println(json);
-		    */
-        	
         	// 單行寫法
         	System.out.println("回傳 DTO JSON:");
         	System.out.println(
@@ -100,4 +117,5 @@ public class PurchaseServiceTest {
         assertTrue(new BigDecimal("3000").compareTo(orderDTO.getTotal()) == 0);
         assertEquals(2, orderDTO.getDetails().size());
 	}
+	
 }

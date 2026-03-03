@@ -15,7 +15,6 @@ public class ProductSpec {
 			Join<Product, ProductSupplier> ps = root.join("productSuppliers");
 			return cb.equal(ps.get("supplier").get("supplierId"), supplierId);
 		};
-		
 	}
 	
 	/** 商品相似名稱 */

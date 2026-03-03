@@ -1,12 +1,15 @@
 package com.storesystem.backend.service;
 
+import com.storesystem.backend.model.dto.PageDTO;
 import com.storesystem.backend.model.dto.purchase.CreateNewOrderDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseOrderDTO;
+import com.storesystem.backend.model.dto.purchase.PurchaseOrderSearchAllDTO;
 
 // 進貨單
 public interface PurchaseService {
 
 	// 搜尋進貨單
+	PageDTO<PurchaseOrderDTO> searchAllPurchaseOrder(PurchaseOrderSearchAllDTO dto);
 	
 	// 建立進貨單(草稿)
 	PurchaseOrderDTO createNewOrder(CreateNewOrderDTO dto);
