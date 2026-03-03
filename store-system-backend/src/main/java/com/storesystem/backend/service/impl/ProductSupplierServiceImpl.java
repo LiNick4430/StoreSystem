@@ -1,7 +1,5 @@
 package com.storesystem.backend.service.impl;
 
-import java.time.LocalDateTime;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.storesystem.backend.exception.ProductSupplierLinkException;
-import com.storesystem.backend.exception.ProductSupplierNotFoundException;
 import com.storesystem.backend.model.dto.PageDTO;
 import com.storesystem.backend.model.dto.productSupplier.PSLinkDTO;
 import com.storesystem.backend.model.dto.productSupplier.PSSearchAllDTO;
@@ -147,7 +144,7 @@ public class ProductSupplierServiceImpl implements ProductSupplierService{
 		productSupplier.unBind();
 		
 		// 3. 軟刪除
-		productSupplier.setDeleteAt(LocalDateTime.now());
+		productSupplier.softDelete();
 		
 		// 4. 回存
 		productSupplier = productSupplierRepository.save(productSupplier);

@@ -1,7 +1,5 @@
 package com.storesystem.backend.service.impl;
 
-import java.time.LocalDateTime;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -164,7 +162,7 @@ public class ProductServiceImpl implements ProductService{
 			});
 		
 		// 3. 執行刪除 並且回存
-		product.setDeleteAt(LocalDateTime.now());
+		product.softDelete();
 		productRepository.save(product);
 	}
 

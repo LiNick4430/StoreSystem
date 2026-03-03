@@ -12,6 +12,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
@@ -50,4 +52,28 @@ public class PurchaseDetail extends BaseEntity{
 	
 	@Column(name = "subtotal", nullable = false, precision = 10, scale = 2)
 	private BigDecimal subtotal;			// 單項 小計
+	
+	/**
+     * 計算小計的私用方法
+     * 邏輯：cost * quantity
+     */
+	private void calculateSubtotal () {
+		if (this.cost != null && this.quantity != null) {
+			this.subtotal = this.cost.multiply(new BigDecimal(this.quantity));
+		} else {
+			this.subtotal = BigDecimal.ZERO;
+		}
+	}
+	
+	// Entity 第一次被存入資料庫前 的 執行方法
+	@PrePersist
+	protected void onPurchaseDetailCreate() {
+		calculateSubtotal();
+	}
+
+	// Entity 更新/修改 前 的 執行方法
+	@PreUpdate
+	protected void onPurchaseDetailUpdate() {
+		calculateSubtotal();
+	}
 }

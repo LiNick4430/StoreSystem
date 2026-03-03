@@ -1,7 +1,10 @@
 package com.storesystem.backend.service.impl;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.storesystem.backend.model.dto.purchase.CreateNewDetialDTO;
 import com.storesystem.backend.model.dto.purchase.CreateNewOrderDTO;
+import com.storesystem.backend.model.dto.purchase.PurchaseDetailDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseOrderDTO;
+import com.storesystem.backend.model.entity.Product;
 import com.storesystem.backend.model.entity.PurchaseDetail;
 import com.storesystem.backend.model.entity.PurchaseOrder;
 import com.storesystem.backend.model.entity.Supplier;
 import com.storesystem.backend.model.enums.PurchaseStatus;
-import com.storesystem.backend.repository.PurchaseDetailRepository;
 import com.storesystem.backend.repository.PurchaseOrderRepository;
 import com.storesystem.backend.service.PurchaseService;
 import com.storesystem.backend.util.NumberUtil;
@@ -36,9 +40,6 @@ public class PurchaseServiceImpl implements PurchaseService{
 	@Autowired
 	private PurchaseOrderRepository purchaseOrderRepository;
 	
-	@Autowired
-	private PurchaseDetailRepository purchaseDetailRepository;
-	
 	// 建立 草稿 進貨單
 	@Override
 	public PurchaseOrderDTO createNewOrder(CreateNewOrderDTO dto) {
@@ -49,14 +50,18 @@ public class PurchaseServiceImpl implements PurchaseService{
 		List<PurchaseDetail> details = dto.getDetails().stream()
 				.map(newDetailDTO -> createDetail(newDetailDTO, order))
 				.toList();
-		details = purchaseDetailRepository.saveAll(details);
+		order.setPurchaseDetails(new HashSet<>(details));
 		
-		// 3. 統合起來回傳
-		PurchaseOrderDTO purchaseOrderDTO = createFinal(order, details);
+		// 3. 讓 Order 計算總額 並更新儲存
+		order.calculateTotalAmount();
 		
-		return purchaseOrderDTO;
+		PurchaseOrder savedOrder = purchaseOrderRepository.saveAndFlush(order);
+		
+		// 4. 轉成 DTO 回傳(將已經存入 order 回傳)
+		return createFinal(savedOrder);
 	}
 
+	// 建立 草稿 進貨主單
 	private PurchaseOrder createOrder(CreateNewOrderDTO dto) {
 		
 		Supplier supplier = entityFetcher.getSupplierById(dto.getSupplierId());		
@@ -72,15 +77,33 @@ public class PurchaseServiceImpl implements PurchaseService{
 		return purchaseOrderRepository.save(order);
 	}
 
+	// 建立 草稿 進貨細項
 	private PurchaseDetail createDetail(CreateNewDetialDTO dto, PurchaseOrder order) {
-		PurchaseDetail detail = new PurchaseDetail();
+		Product product = entityFetcher.getProductById(dto.getProductId());
+		
+		PurchaseDetail detail = new PurchaseDetail();		
+		detail.setPurchaseOrder(order);
+		detail.setProduct(product);
+		detail.setQuantity(dto.getQuantity());
+		detail.setCost(dto.getCost());
 		
 		return detail;
 	}
 
-	private PurchaseOrderDTO createFinal(PurchaseOrder purchaseOrder, List<PurchaseDetail> purchaseDetails) {
-		// TODO Auto-generated method stub
-		return null;
+	// 草稿訂貨單 轉成 DTO 的 方法
+	private PurchaseOrderDTO createFinal(PurchaseOrder order) {
+		// 1. 建立 PurchaseOrderDTO
+		PurchaseOrderDTO orderDTO = modelMapper.map(order, PurchaseOrderDTO.class);
+		
+		// 2. 建立 Set<PurchaseDetailDTO>
+		Set<PurchaseDetailDTO> detailDTOs = order.getPurchaseDetails().stream()
+				.map(detail -> modelMapper.map(detail, PurchaseDetailDTO.class))
+				.collect(Collectors.toSet());
+		
+		// 3. 組合後回傳
+		orderDTO.setDetails(detailDTOs);
+		
+		return orderDTO;
 	}
 
 }

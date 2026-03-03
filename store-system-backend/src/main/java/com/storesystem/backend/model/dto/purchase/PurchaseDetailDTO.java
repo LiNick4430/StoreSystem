@@ -15,6 +15,8 @@ public class PurchaseDetailDTO {
 	private Long orderId;			// 進貨單 ID
 	
 	private Long productId;			// 商品 ID
+	private String productName;		// 商品 名稱
+	private String productSpec;		// 商品 規格
 	
 	private BigDecimal cost;		// 進貨 價格
 	

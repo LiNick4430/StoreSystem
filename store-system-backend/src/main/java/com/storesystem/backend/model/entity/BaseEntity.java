@@ -28,19 +28,19 @@ public class BaseEntity {
 	
 	// Entity 第一次被存入資料庫前 的 執行方法
 	@PrePersist
-	protected void onCreate() {
+	protected void onBaseEntityCreate() {
 		this.createDate = LocalDateTime.now();
 		this.updateDate = LocalDateTime.now();
 	}
 	
 	// Entity 更新/修改 前 的 執行方法
 	@PreUpdate
-	protected void onUpdate() {
+	protected void onBaseEntityUpdate() {
 		this.updateDate = LocalDateTime.now();
 	}
 	
 	// 軟刪除 的 執行方法
-	protected void softDelete() {
+	public void softDelete() {
 		this.deleteAt = LocalDateTime.now();
 	}
 }
