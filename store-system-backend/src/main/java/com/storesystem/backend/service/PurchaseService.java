@@ -4,6 +4,7 @@ import com.storesystem.backend.model.dto.PageDTO;
 import com.storesystem.backend.model.dto.purchase.CreateNewOrderDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseOrderDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseOrderSearchAllDTO;
+import com.storesystem.backend.model.dto.purchase.UpdateOrderDTO;
 
 // 進貨單
 public interface PurchaseService {
@@ -13,12 +14,13 @@ public interface PurchaseService {
 	
 	// 建立進貨單(草稿)
 	PurchaseOrderDTO createNewOrder(CreateNewOrderDTO dto);
-	// 1. 建立總單
-	// 2. 建立明細
-	// 3. 統合起來回傳
+	
+	// 更新進貨單(草稿) 只要用於 草稿 最後的 明細修正 
+	PurchaseOrderDTO updateOrder(UpdateOrderDTO dto);
 	
 	// 進貨單 狀態 與 盤點後的 正確進貨數量
 	// 1. 更新 明細中 改成 正確的數量 同時連動改變 總金額
+	
 	
 	// 2. 狀態 草稿 -> 入庫完成 
 	

@@ -1,5 +1,7 @@
 package com.storesystem.backend.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -10,11 +12,13 @@ import org.springframework.stereotype.Repository;
 
 import com.storesystem.backend.model.entity.PurchaseOrder;
 
+
 @Repository
 public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Long>, JpaSpecificationExecutor<PurchaseOrder>{
 
 	@Override
-    @EntityGraph(attributePaths = {"purchaseDetails", "supplier"})
+    @EntityGraph(attributePaths = {"supplier"})
     Page<PurchaseOrder> findAll(Specification<PurchaseOrder> spec, Pageable pageable);
 	
+	Optional<PurchaseOrder> findByPurchaseOrderId(Long orderId);
 }

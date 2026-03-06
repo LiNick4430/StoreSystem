@@ -60,30 +60,38 @@ public class PurchaseOrder extends BaseEntity{
 	@OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
 	private Set<PurchaseDetail> purchaseDetails;	// 對應進貨明細
 
+	@Column(name = "detail_count", nullable = false)
+	private Integer detailCount = 0;				// 對應明細 數量
+	
+	
 	/**
-	 * 計算 總金額 的 私用方法
-	 * 邏輯： 明細的小計統合
+	 * 計算 總金額 與 總筆數 的 私用方法
 	 */
-	public void calculateTotalAmount() {
+	public void updateSummary() {
 		if (this.purchaseDetails == null || this.purchaseDetails.isEmpty()) {
 			this.totalAmount = BigDecimal.ZERO;
+			this.detailCount = 0;
 		} else {
+			// 1. 計算 總金額
 			this.totalAmount = purchaseDetails.stream()
 					.map(detail -> detail.getSubtotal())
 					.filter(subtotal -> subtotal != null)	// 預防萬一 過濾掉 空的 小計
 					.reduce(BigDecimal.ZERO, BigDecimal::add);	// BigDecimal.ZERO 起始參數 , BigDecimal::add 後續累加起來
+			
+			// 2. 計算 總筆數(方便後續計算)
+			this.detailCount = purchaseDetails.size();
 		}
 	}
 
 	// Entity 第一次被存入資料庫前 的 執行方法
 	@PrePersist
 	protected void onPurchaseOrderCreate() {
-		calculateTotalAmount();
+		updateSummary();
 	}
 
 	// Entity 更新/修改 前 的 執行方法
 	@PreUpdate
 	protected void onPurchaseOrderUpdate() {
-		calculateTotalAmount();
+		updateSummary();
 	}
 }

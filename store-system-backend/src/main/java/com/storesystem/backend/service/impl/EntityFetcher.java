@@ -5,12 +5,15 @@ import org.springframework.stereotype.Service;
 
 import com.storesystem.backend.exception.ProductNotFoundException;
 import com.storesystem.backend.exception.ProductSupplierLinkException;
+import com.storesystem.backend.exception.PurchaseOrderNotFoundException;
 import com.storesystem.backend.exception.SupplierNotFoundException;
 import com.storesystem.backend.model.entity.Product;
 import com.storesystem.backend.model.entity.ProductSupplier;
+import com.storesystem.backend.model.entity.PurchaseOrder;
 import com.storesystem.backend.model.entity.Supplier;
 import com.storesystem.backend.repository.ProductRepository;
 import com.storesystem.backend.repository.ProductSupplierRepository;
+import com.storesystem.backend.repository.PurchaseOrderRepository;
 import com.storesystem.backend.repository.SupplierRepository;
 
 /**
@@ -24,6 +27,9 @@ public class EntityFetcher {
 
 	@Autowired
 	private ProductRepository productRepository;
+	
+	@Autowired
+	private PurchaseOrderRepository purchaseOrderRepository;
 	
 	@Autowired
 	private ProductSupplierRepository productSupplierRepository;
@@ -90,5 +96,11 @@ public class EntityFetcher {
 	public ProductSupplier getProductSupplierIsDelete(Product product, Supplier supplier) {
 		return productSupplierRepository.findByProductAndSupplierIsDelete(product.getProductId(), supplier.getSupplierId())
 				.orElse(null);
+	}
+	
+	/** 使用訂單號碼 找尋該訂單 */
+	public PurchaseOrder getPurchaseOrder(Long orderId) {
+		return purchaseOrderRepository.findByPurchaseOrderId(orderId)
+				.orElseThrow(() -> new PurchaseOrderNotFoundException("找不到該訂單"));
 	}
 }

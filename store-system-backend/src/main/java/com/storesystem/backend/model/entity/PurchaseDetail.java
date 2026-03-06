@@ -57,7 +57,7 @@ public class PurchaseDetail extends BaseEntity{
      * 計算小計的私用方法
      * 邏輯：cost * quantity
      */
-	private void calculateSubtotal () {
+	public void calculateSubtotal () {
 		if (this.cost != null && this.quantity != null) {
 			this.subtotal = this.cost.multiply(new BigDecimal(this.quantity));
 		} else {

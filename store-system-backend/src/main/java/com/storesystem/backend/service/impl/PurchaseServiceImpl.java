@@ -1,6 +1,5 @@
 package com.storesystem.backend.service.impl;
 
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,12 +13,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.storesystem.backend.exception.PurchaseOrderErrorException;
 import com.storesystem.backend.model.dto.PageDTO;
 import com.storesystem.backend.model.dto.purchase.CreateNewDetialDTO;
 import com.storesystem.backend.model.dto.purchase.CreateNewOrderDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseDetailDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseOrderDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseOrderSearchAllDTO;
+import com.storesystem.backend.model.dto.purchase.UpdateOrderDTO;
 import com.storesystem.backend.model.entity.Product;
 import com.storesystem.backend.model.entity.PurchaseDetail;
 import com.storesystem.backend.model.entity.PurchaseOrder;
@@ -47,7 +48,7 @@ public class PurchaseServiceImpl implements PurchaseService{
 	@Autowired
 	private PurchaseOrderRepository purchaseOrderRepository;
 
-	// 搜尋 該供應商 的 所有進貨單 
+	// 搜尋 該供應商 的 所有進貨單
 	@Override
 	public PageDTO<PurchaseOrderDTO> searchAllPurchaseOrder(PurchaseOrderSearchAllDTO dto) {
 		// 1. 建立頁碼資料
@@ -55,16 +56,26 @@ public class PurchaseServiceImpl implements PurchaseService{
 
 		// 2. 分類執行
 		Specification<PurchaseOrder> spec = Specification.unrestricted();
-		
+
 		spec = spec.and(PurchaseOrderSpec.hasSupplierId(dto.getSupplierId()));
-		
-		// TODO 後續修正
-		
+
+		if (dto.getStatus() != null) {
+			spec = spec.and(PurchaseOrderSpec.hasPurchaseStatus(dto.getStatus()));
+		}
+
+		if (dto.getOrderYearMonth() != null) {
+			spec = spec.and(PurchaseOrderSpec.inMonth(dto.getOrderYearMonth()));
+		}
+
+		if (dto.getProductId() != null) {
+			spec = spec.and(PurchaseOrderSpec.hasProductId(dto.getProductId()));
+		}
+
 		Page<PurchaseOrder> page = purchaseOrderRepository.findAll(spec, pageable);
 
 		return PageUtil.toPageDTO(page, order -> {
 			PurchaseOrderDTO orderDTO = modelMapper.map(order, PurchaseOrderDTO.class);
-			orderDTO.setDetailQty(order.getPurchaseDetails().size());
+			orderDTO.setDetailQty(order.getDetailCount());
 			return orderDTO;
 		});
 	}
@@ -75,19 +86,34 @@ public class PurchaseServiceImpl implements PurchaseService{
 		// 1. 建立總單
 		PurchaseOrder order = createOrder(dto);
 
-		// 2. 建立明細
+		// 2. 建立明細 並關連
 		List<PurchaseDetail> details = dto.getDetails().stream()
 				.map(newDetailDTO -> createDetail(newDetailDTO, order))
 				.toList();
 		order.setPurchaseDetails(new HashSet<>(details));
 
-		// 3. 讓 Order 計算總額 並更新儲存
-		order.calculateTotalAmount();
+		// 3. 計算摘要
+		order.updateSummary();
 
+		// 4. 一次性儲存
 		PurchaseOrder savedOrder = purchaseOrderRepository.saveAndFlush(order);
 
-		// 4. 轉成 DTO 回傳(將已經存入 order 回傳)
+		// 5. 轉成 DTO 回傳
 		return toDTO(savedOrder);
+	}
+	
+	// 更新 草稿訂單 的 明細
+	@Override
+	public PurchaseOrderDTO updateOrder(UpdateOrderDTO dto) {
+		// 1. 找出該訂單
+		PurchaseOrder purchaseOrder = entityFetcher.getPurchaseOrder(dto.getOrderId());
+		if (!purchaseOrder.getStatus().equals(PurchaseStatus.DRAFT)) {
+			throw new PurchaseOrderErrorException("訂單狀態錯誤 僅有草稿狀態可以修正明細");
+		}
+		
+		// TODO 後續 針對 明細 做細節調整
+		
+		return null;
 	}
 
 	// 建立 草稿 進貨主單
@@ -101,9 +127,8 @@ public class PurchaseServiceImpl implements PurchaseService{
 		order.setPurchaseOrderNumber(number);
 		order.setPurchaseOrderDate(dto.getDate());
 		order.setStatus(PurchaseStatus.DRAFT);
-		order.setTotalAmount(new BigDecimal(0));
 
-		return purchaseOrderRepository.save(order);
+		return order;
 	}
 
 	// 建立 草稿 進貨細項
@@ -115,6 +140,7 @@ public class PurchaseServiceImpl implements PurchaseService{
 		detail.setProduct(product);
 		detail.setQuantity(dto.getQuantity());
 		detail.setCost(dto.getCost());
+		detail.calculateSubtotal();	// 預先計算 小計 方便後續處理
 
 		return detail;
 	}
@@ -135,6 +161,6 @@ public class PurchaseServiceImpl implements PurchaseService{
 		return orderDTO;
 	}
 
-
+	
 
 }

@@ -1,6 +1,9 @@
 package com.storesystem.backend.model.dto.purchase;
 
-import jakarta.validation.constraints.NotBlank;
+import java.time.YearMonth;
+
+import com.storesystem.backend.model.enums.PurchaseStatus;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +14,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PurchaseOrderSearchAllDTO {
 
-	@NotBlank(message = "缺少供應商ID")
-	private Long supplierId;
+	@NotNull(message = "缺少供應商ID")
+	private Long supplierId;			// 供應商ID(必選)
+	
+	private PurchaseStatus status;		// 進貨單狀態(可選)
+	
+	private YearMonth orderYearMonth;	// 訂單的年月(可選)
+	
+	private Long productId;				// 商品ID(可選)
 	
 	@NotNull(message = "缺少頁碼")
 	private Integer page;	// 頁面 
