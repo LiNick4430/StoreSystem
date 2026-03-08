@@ -45,4 +45,6 @@ public class InventoryLog extends BaseEntity{
 	@Column(name = "after_quantity", nullable = false)
 	private Integer afterQuantity;		// 商品 進貨後 數量
 	
+	@Column(name = "warehouse_name", nullable = false)
+	private String warehouseName;		// 出入庫 人員
 }

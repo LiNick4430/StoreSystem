@@ -3,6 +3,7 @@ package com.storesystem.backend.model.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.annotations.SQLRestriction;
 
@@ -72,14 +73,19 @@ public class PurchaseOrder extends BaseEntity{
 			this.totalAmount = BigDecimal.ZERO;
 			this.detailCount = 0;
 		} else {
+			// 過濾掉已軟刪除的項目
+	        Set<PurchaseDetail> activeDetails = purchaseDetails.stream()
+	                .filter(d -> d.getDeleteAt() == null)
+	                .collect(Collectors.toSet());
+			
 			// 1. 計算 總金額
-			this.totalAmount = purchaseDetails.stream()
+			this.totalAmount = activeDetails.stream()
 					.map(detail -> detail.getSubtotal())
-					.filter(subtotal -> subtotal != null)	// 預防萬一 過濾掉 空的 小計
-					.reduce(BigDecimal.ZERO, BigDecimal::add);	// BigDecimal.ZERO 起始參數 , BigDecimal::add 後續累加起來
+					.filter(subtotal -> subtotal != null)			// 預防萬一 過濾掉 空的 小計
+					.reduce(BigDecimal.ZERO, BigDecimal::add);		// BigDecimal.ZERO 起始參數 , BigDecimal::add 後續累加起來
 			
 			// 2. 計算 總筆數(方便後續計算)
-			this.detailCount = purchaseDetails.size();
+			this.detailCount = activeDetails.size();
 		}
 	}
 
