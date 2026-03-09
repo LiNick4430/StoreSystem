@@ -48,7 +48,7 @@ public class InventoryLogServiceImpl implements InventoryLogService{
 				.toList();
 		
 		// 1. 建立頁碼資料
-		Pageable pageable = PageUtil.getPageable(dto.getPage(), dto.getSize());
+		Pageable pageable = PageUtil.getPageable(dto.getPage(), dto.getSize(), false, "inventoryLogId");
 
 		// 2. 分類執行
 		Specification<InventoryLog> spec = Specification.unrestricted();
