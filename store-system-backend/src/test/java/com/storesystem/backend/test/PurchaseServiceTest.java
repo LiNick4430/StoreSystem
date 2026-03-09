@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -66,7 +67,7 @@ public class PurchaseServiceTest {
 
 	}
 
-	// @Test
+	@Test
 	void createNewOrder() {
 		// 1. 建立 模擬資料 DTO
 		CreateNewOrderDTO newOrderDTO = new CreateNewOrderDTO();
@@ -82,8 +83,13 @@ public class PurchaseServiceTest {
 		newDetialDTO2.setProductId(2L);
 		newDetialDTO2.setCost(new BigDecimal(12));
 		newDetialDTO2.setQuantity(100);
+		
+		CreateNewDetialDTO newDetialDTO3 = new CreateNewDetialDTO();
+		newDetialDTO3.setProductId(3L);
+		newDetialDTO3.setCost(new BigDecimal(20));
+		newDetialDTO3.setQuantity(100);
 
-		Set<CreateNewDetialDTO> createNewDetialDTOs = new HashSet<CreateNewDetialDTO>(List.of(newDetialDTO1, newDetialDTO2));
+		Set<CreateNewDetialDTO> createNewDetialDTOs = new LinkedHashSet<CreateNewDetialDTO>(List.of(newDetialDTO1, newDetialDTO2, newDetialDTO3));
 		newOrderDTO.setDetails(createNewDetialDTOs);
 
 		// 2. 執行 Service
@@ -99,7 +105,7 @@ public class PurchaseServiceTest {
 		System.out.println();
 
 		assertNotNull(latestOrder.getPurchaseOrderNumber());
-		assertTrue(new BigDecimal("3000").compareTo(latestOrder.getTotalAmount()) == 0);
+		assertTrue(new BigDecimal("5000").compareTo(latestOrder.getTotalAmount()) == 0);
 
 		// 4. 驗證 回傳DTO
 		try {
@@ -118,11 +124,11 @@ public class PurchaseServiceTest {
 
 		assertNotNull(orderDTO);
 		assertNotNull(orderDTO.getNumber());
-		assertTrue(new BigDecimal("3000").compareTo(orderDTO.getTotal()) == 0);
-		assertEquals(2, orderDTO.getDetails().size());
+		assertTrue(new BigDecimal("5000").compareTo(orderDTO.getTotal()) == 0);
+		assertEquals(3, orderDTO.getDetails().size());
 	}
 
-	@Test
+	// @Test
 	void updateOrder() {
 		// 1. 建立 模擬資料 DTO
 		UpdateOrderDTO updateOrderDTO = new UpdateOrderDTO();

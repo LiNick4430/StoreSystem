@@ -1,6 +1,7 @@
 package com.storesystem.backend.model.dto.purchase;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -21,6 +22,6 @@ public class CreateNewOrderDTO {
 	private LocalDate date;		// 進貨日期
 	
 	@NotEmpty(message = "進貨明細至少需要一筆")
-	private Set<CreateNewDetialDTO> details;	// 對應的 明細
+	private Set<CreateNewDetialDTO> details = new LinkedHashSet<>();	// 對應的 明細
 
 }

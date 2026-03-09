@@ -1,6 +1,7 @@
 package com.storesystem.backend.service.impl;
 
-import java.util.HashSet;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -101,7 +102,7 @@ public class PurchaseServiceImpl implements PurchaseService{
 		List<PurchaseDetail> details = dto.getDetails().stream()
 				.map(newDetailDTO -> createDetail(newDetailDTO, order))
 				.toList();
-		order.setPurchaseDetails(new HashSet<>(details));
+		order.setPurchaseDetails(new LinkedHashSet<>(details));
 
 		// 3. 計算摘要
 		order.updateSummary();
@@ -260,15 +261,14 @@ public class PurchaseServiceImpl implements PurchaseService{
 		// 1. 建立 PurchaseOrderDTO
 		PurchaseOrderDTO orderDTO = modelMapper.map(order, PurchaseOrderDTO.class);
 
-		// 2. 建立 Set<PurchaseDetailDTO>
+		// 2. 建立 Set<PurchaseDetailDTO> 同時使用 PurchaseDetailId 來 排序
 		Set<PurchaseDetailDTO> detailDTOs = order.getPurchaseDetails().stream()
+				.sorted(Comparator.comparing(PurchaseDetail::getPurchaseDetailId))
 				.map(detail -> modelMapper.map(detail, PurchaseDetailDTO.class))
-				.collect(Collectors.toSet());
+				.collect(Collectors.toCollection(LinkedHashSet::new));
 
 		// 3. 組合後回傳
 		orderDTO.setDetails(detailDTOs);
 		return orderDTO;
 	}
-
-
 }

@@ -2,6 +2,7 @@ package com.storesystem.backend.model.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,6 +22,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -59,11 +61,11 @@ public class PurchaseOrder extends BaseEntity{
 	private PurchaseStatus status;		// 進貨單狀態
 
 	@OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
-	private Set<PurchaseDetail> purchaseDetails;	// 對應進貨明細
+	@OrderBy("purchaseDetailId ASC")
+	private Set<PurchaseDetail> purchaseDetails = new LinkedHashSet<>();	// 對應進貨明細
 
 	@Column(name = "detail_count", nullable = false)
 	private Integer detailCount = 0;				// 對應明細 數量
-	
 	
 	/**
 	 * 計算 總金額 與 總筆數 的 私用方法
