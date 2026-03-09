@@ -37,9 +37,9 @@ public class PageUtil {
 		int finalSize = (size < MAX_SIZE) ? size : MAX_SIZE;
 		
 		// 調整排序功能
-		Sort sort = (isAsc != null && sortField != null) 
-			? Sort.by( isAsc ? Sort.Direction.ASC : Sort.Direction.DESC , sortField )
-			: Sort.by( Sort.Direction.DESC, "createDate");
+		Sort sort = (isAsc != null && sortField != null) // 當 兩者都不是 null 則 進入自訂排序
+			? Sort.by( isAsc ? Sort.Direction.ASC : Sort.Direction.DESC , sortField )	// 自訂排序
+			: Sort.by( Sort.Direction.DESC, "createDate");	// 預設排序 使用 建立時間 從 新 到 舊
 
 		return PageRequest.of(pageNumber, finalSize, sort);
 	}
