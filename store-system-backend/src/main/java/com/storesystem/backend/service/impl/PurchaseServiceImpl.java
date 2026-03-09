@@ -32,6 +32,7 @@ import com.storesystem.backend.model.enums.PurchaseStatus;
 import com.storesystem.backend.repository.PurchaseDetailRepository;
 import com.storesystem.backend.repository.PurchaseOrderRepository;
 import com.storesystem.backend.repository.spec.PurchaseOrderSpec;
+import com.storesystem.backend.service.InventoryLogService;
 import com.storesystem.backend.service.PurchaseService;
 import com.storesystem.backend.util.NumberUtil;
 import com.storesystem.backend.util.PageUtil;
@@ -48,6 +49,9 @@ public class PurchaseServiceImpl implements PurchaseService{
 
 	@Autowired
 	private NumberUtil numberUtil;
+
+	@Autowired
+	private InventoryLogService inventoryLogService;
 
 	@Autowired
 	private PurchaseOrderRepository purchaseOrderRepository;
@@ -201,17 +205,17 @@ public class PurchaseServiceImpl implements PurchaseService{
 		if (!purchaseOrder.getStatus().equals(PurchaseStatus.DRAFT)) {
 			throw new PurchaseOrderErrorException("訂單狀態錯誤 僅有草稿狀態可以簽收入庫");
 		}
-		
-		// 2. 簽收入庫 同時 紀錄 庫存LOG
-		purchaseOrder.getPurchaseDetails().stream().forEach(detail -> {
-			// TODO
-		});
-		
-		purchaseOrder.setStatus(PurchaseStatus.RECEIVED);
-		
-		// 3. 回存
-		PurchaseOrder savedOrder = purchaseOrderRepository.save(purchaseOrder);
 
+		// 2. 簽收入庫 同時 紀錄 庫存LOG
+		purchaseOrder.getPurchaseDetails().stream()
+		.filter(detail -> detail.getDeleteAt() == null)		// 預防萬一 
+		.forEach(detail -> inventoryLogService.createInventoryLog(detail, dto.getName()));
+
+		// 3. 變更狀態
+		purchaseOrder.setStatus(PurchaseStatus.RECEIVED);
+
+		// 4. 回存
+		PurchaseOrder savedOrder = purchaseOrderRepository.save(purchaseOrder);
 		return toDTO(savedOrder);
 	}
 

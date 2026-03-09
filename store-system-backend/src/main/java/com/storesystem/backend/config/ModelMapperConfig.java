@@ -7,11 +7,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.storesystem.backend.converter.PurchaseStatusToDescriptionConveter;
+import com.storesystem.backend.model.dto.inventoryLog.InventoryLogDTO;
 import com.storesystem.backend.model.dto.product.ProductDTO;
 import com.storesystem.backend.model.dto.productSupplier.ProductSupplierDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseDetailDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseOrderDTO;
 import com.storesystem.backend.model.dto.supplier.SupplierDTO;
+import com.storesystem.backend.model.entity.InventoryLog;
 import com.storesystem.backend.model.entity.Product;
 import com.storesystem.backend.model.entity.ProductSupplier;
 import com.storesystem.backend.model.entity.PurchaseDetail;
@@ -82,6 +84,11 @@ public class ModelMapperConfig {
 			mapper.map(PurchaseDetail::getCost, PurchaseDetailDTO::setCost);
 			mapper.map(PurchaseDetail::getQuantity, PurchaseDetailDTO::setQuantity);
 			mapper.map(PurchaseDetail::getSubtotal, PurchaseDetailDTO::setSubtotal);
+		});
+		
+		modelMapper.typeMap(InventoryLog.class, InventoryLogDTO.class).addMappings(mapper -> {
+			mapper.map(src -> src.getPurchaseDetail().getPurchaseDetailId(), InventoryLogDTO::setPurchaseDetailId);
+			mapper.map(src -> src.getProduct().getProductId(), InventoryLogDTO::setProductId);
 		});
 		
 		// ------------------------------------------------------------------------------------
