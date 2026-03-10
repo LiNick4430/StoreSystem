@@ -22,7 +22,10 @@ import com.storesystem.backend.model.dto.PageDTO;
 import com.storesystem.backend.model.dto.purchase.CreateNewDetialDTO;
 import com.storesystem.backend.model.dto.purchase.CreateNewOrderDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseOrderDTO;
+import com.storesystem.backend.model.dto.purchase.PurchaseOrderFindByIdDTO;
+import com.storesystem.backend.model.dto.purchase.PurchaseOrderFindByNumberDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseOrderSearchAllDTO;
+import com.storesystem.backend.model.dto.purchase.PurchaseOrderSearchDTO;
 import com.storesystem.backend.model.dto.purchase.UpdateDetialDTO;
 import com.storesystem.backend.model.dto.purchase.UpdateOrderDTO;
 import com.storesystem.backend.model.entity.PurchaseOrder;
@@ -64,10 +67,54 @@ public class PurchaseServiceTest {
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Test
+	void search() {
+		// 0. 基本資料
+		Long id = 1L;
+		String number = "PON_20260306_0002";
+		
+		// 1. 建立 搜尋DTO
+		PurchaseOrderFindByIdDTO findByIdDTO = new PurchaseOrderFindByIdDTO();
+		findByIdDTO.setId(id);
+		
+		PurchaseOrderFindByNumberDTO findByNumberDTO = new PurchaseOrderFindByNumberDTO();
+		findByNumberDTO.setNumber(number);
 
+		// 2. 執行方法
+		PurchaseOrderDTO orderDTO = purchaseService.searchPurchaseOrder(PurchaseOrderSearchDTO.from(findByIdDTO));
+		PurchaseOrderDTO orderDTO2 = purchaseService.searchPurchaseOrder(PurchaseOrderSearchDTO.from(findByNumberDTO));
+		
+
+		// 3. 測試顯示
+		assertNotNull(orderDTO);
+		assertNotNull(orderDTO2);
+		
+		try {
+			// 單行寫法
+			System.out.println("回傳 DTO JSON:");
+			System.out.println(
+					new ObjectMapper()
+					.findAndRegisterModules()
+					.writerWithDefaultPrettyPrinter()
+					.writeValueAsString(orderDTO)
+					);
+			
+			System.out.println("回傳 DTO2 JSON:");
+			System.out.println(
+					new ObjectMapper()
+					.findAndRegisterModules()
+					.writerWithDefaultPrettyPrinter()
+					.writeValueAsString(orderDTO2)
+					);
+
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
 	}
 
-	@Test
+	// @Test
 	void createNewOrder() {
 		// 1. 建立 模擬資料 DTO
 		CreateNewOrderDTO newOrderDTO = new CreateNewOrderDTO();
