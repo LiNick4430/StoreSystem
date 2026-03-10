@@ -98,9 +98,15 @@ public class EntityFetcher {
 				.orElse(null);
 	}
 	
-	/** 使用訂單號碼 找尋該訂單 */
-	public PurchaseOrder getPurchaseOrder(Long orderId) {
+	/** 使用 訂單ID 找尋該訂單 */
+	public PurchaseOrder getPurchaseOrderById(Long orderId) {
 		return purchaseOrderRepository.findByPurchaseOrderId(orderId)
+				.orElseThrow(() -> new PurchaseOrderNotFoundException("找不到該訂單"));
+	}
+	
+	/** 使用 訂單單號 找尋該訂單 */
+	public PurchaseOrder getPurchaseOrderByNumber(String purchaseOrderNumber) {
+		return purchaseOrderRepository.findByPurchaseOrderNumber(purchaseOrderNumber)
 				.orElseThrow(() -> new PurchaseOrderNotFoundException("找不到該訂單"));
 	}
 }

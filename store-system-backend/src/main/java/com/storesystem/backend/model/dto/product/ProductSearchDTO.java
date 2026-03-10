@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** ProductService 專用中間 DTO*/
+/** ProductService 專用中間 DTO */
 @Getter
 @Setter
 @NoArgsConstructor

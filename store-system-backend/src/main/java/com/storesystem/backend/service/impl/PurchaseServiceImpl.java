@@ -16,12 +16,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.storesystem.backend.exception.PurchaseOrderErrorException;
+import com.storesystem.backend.exception.PurchaseOrderNotFoundException;
 import com.storesystem.backend.model.dto.PageDTO;
 import com.storesystem.backend.model.dto.purchase.CreateNewDetialDTO;
 import com.storesystem.backend.model.dto.purchase.CreateNewOrderDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseDetailDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseOrderDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseOrderSearchAllDTO;
+import com.storesystem.backend.model.dto.purchase.PurchaseOrderSearchDTO;
 import com.storesystem.backend.model.dto.purchase.ReceivedOrderDTO;
 import com.storesystem.backend.model.dto.purchase.UpdateDetialDTO;
 import com.storesystem.backend.model.dto.purchase.UpdateOrderDTO;
@@ -92,6 +94,24 @@ public class PurchaseServiceImpl implements PurchaseService{
 		});
 	}
 
+	// 搜尋 特定的 訂貨單
+	@Override
+	public PurchaseOrderDTO searchPurchaseOrder(PurchaseOrderSearchDTO dto) {
+		// 1. 根據 來源 尋找目標 訂單
+		PurchaseOrder purchaseOrder = null;
+		if (dto.getId() != null) {
+			purchaseOrder = entityFetcher.getPurchaseOrderById(dto.getId());
+		} else if (dto.getNumber() != null) {
+			purchaseOrder = entityFetcher.getPurchaseOrderByNumber(dto.getNumber());
+		} else {
+			// 防呆用 正常流程 不可能到達
+			throw new PurchaseOrderNotFoundException("找不到該訂單");
+		}
+		
+		// 2. 轉成 DTO
+		return toDTO(purchaseOrder);
+	}
+	
 	// 建立 草稿 進貨單
 	@Override
 	public PurchaseOrderDTO createNewOrder(CreateNewOrderDTO dto) {
@@ -128,7 +148,7 @@ public class PurchaseServiceImpl implements PurchaseService{
 		}
 
 		// 1. 找出該訂單
-		PurchaseOrder purchaseOrder = entityFetcher.getPurchaseOrder(dto.getOrderId());
+		PurchaseOrder purchaseOrder = entityFetcher.getPurchaseOrderById(dto.getOrderId());
 		if (!purchaseOrder.getStatus().equals(PurchaseStatus.DRAFT)) {
 			throw new PurchaseOrderErrorException("訂單狀態錯誤 僅有草稿狀態可以修正明細");
 		}
@@ -202,7 +222,7 @@ public class PurchaseServiceImpl implements PurchaseService{
 	@Override
 	public PurchaseOrderDTO receivedOrder(ReceivedOrderDTO dto) {
 		// 1. 找出該訂單
-		PurchaseOrder purchaseOrder = entityFetcher.getPurchaseOrder(dto.getOrderId());
+		PurchaseOrder purchaseOrder = entityFetcher.getPurchaseOrderById(dto.getOrderId());
 		if (!purchaseOrder.getStatus().equals(PurchaseStatus.DRAFT)) {
 			throw new PurchaseOrderErrorException("訂單狀態錯誤 僅有草稿狀態可以簽收入庫");
 		}
@@ -271,4 +291,5 @@ public class PurchaseServiceImpl implements PurchaseService{
 		orderDTO.setDetails(detailDTOs);
 		return orderDTO;
 	}
+
 }

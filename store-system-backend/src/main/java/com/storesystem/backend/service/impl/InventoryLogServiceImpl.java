@@ -42,7 +42,7 @@ public class InventoryLogServiceImpl implements InventoryLogService{
 	@Override
 	public PageDTO<InventoryLogDTO> searchAllLog(InventoryLogSearchAllDTO dto) {
 		// 0. 抓取相關的 detail ID
-		PurchaseOrder purchaseOrder = entityFetcher.getPurchaseOrder(dto.getOrderId());
+		PurchaseOrder purchaseOrder = entityFetcher.getPurchaseOrderById(dto.getOrderId());
 		List<Long> detailIds = purchaseOrder.getPurchaseDetails().stream()
 				.map(detail -> detail.getPurchaseDetailId())
 				.toList();

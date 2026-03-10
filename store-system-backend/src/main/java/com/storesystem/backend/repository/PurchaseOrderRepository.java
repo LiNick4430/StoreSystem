@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import com.storesystem.backend.model.entity.PurchaseOrder;
 
 
+
 @Repository
 public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Long>, JpaSpecificationExecutor<PurchaseOrder>{
 
@@ -21,4 +22,6 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Lo
     Page<PurchaseOrder> findAll(Specification<PurchaseOrder> spec, Pageable pageable);
 	
 	Optional<PurchaseOrder> findByPurchaseOrderId(Long orderId);
+	
+	Optional<PurchaseOrder> findByPurchaseOrderNumber(String purchaseOrderNumber);
 }

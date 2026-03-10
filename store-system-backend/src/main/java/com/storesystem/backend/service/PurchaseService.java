@@ -4,6 +4,7 @@ import com.storesystem.backend.model.dto.PageDTO;
 import com.storesystem.backend.model.dto.purchase.CreateNewOrderDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseOrderDTO;
 import com.storesystem.backend.model.dto.purchase.PurchaseOrderSearchAllDTO;
+import com.storesystem.backend.model.dto.purchase.PurchaseOrderSearchDTO;
 import com.storesystem.backend.model.dto.purchase.ReceivedOrderDTO;
 import com.storesystem.backend.model.dto.purchase.UpdateOrderDTO;
 
@@ -12,6 +13,8 @@ public interface PurchaseService {
 
 	// 搜尋進貨單
 	PageDTO<PurchaseOrderDTO> searchAllPurchaseOrder(PurchaseOrderSearchAllDTO dto);
+	
+	PurchaseOrderDTO searchPurchaseOrder(PurchaseOrderSearchDTO dto);
 	
 	// 建立進貨單(草稿)
 	PurchaseOrderDTO createNewOrder(CreateNewOrderDTO dto);
